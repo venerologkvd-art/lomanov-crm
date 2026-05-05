@@ -6,7 +6,6 @@
 <title>Медсестра — Dr. Lomanov</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Unbounded:wght@300;400;700;900&display=swap');
-
 :root{
   --bg:#060b10;--s1:#0d1520;--s2:#162030;--bd:#1e3050;
   --tx:#c8e0ff;--mt:#3a5070;
@@ -16,127 +15,111 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrains Mono',monospace;overflow:hidden;}
 
-.app{display:grid;height:100vh;grid-template-rows:auto auto auto 1fr auto auto;gap:0;}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;}
 
-/* Top bar */
-.top{display:flex;align-items:center;justify-content:space-between;padding:10px 14px 8px;border-bottom:1px solid var(--bd);background:var(--s1);flex-shrink:0;}
-.clock{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:700;letter-spacing:.04em;}
-.dstr{font-size:9px;color:var(--mt);letter-spacing:.12em;text-transform:uppercase;margin-top:1px;}
-.logo-r{text-align:right;}
-.logo-r div:first-child{font-family:'Unbounded',sans-serif;font-size:9px;font-weight:300;letter-spacing:.22em;color:var(--mt);text-transform:uppercase;}
-.logo-r div:last-child{font-size:9px;color:var(--mt);letter-spacing:.08em;margin-top:2px;}
+/* Top */
+.top{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--bd);background:var(--s1);flex-shrink:0;}
+.clock{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:700;letter-spacing:.04em;}
+.dstr{font-size:8px;color:var(--mt);letter-spacing:.1em;text-transform:uppercase;margin-top:1px;}
+.logo-r div:first-child{font-family:'Unbounded',sans-serif;font-size:8px;font-weight:300;letter-spacing:.2em;color:var(--mt);text-transform:uppercase;text-align:right;}
+.logo-r div:last-child{font-size:8px;color:var(--mt);letter-spacing:.06em;margin-top:1px;text-align:right;}
 
-/* Doctor status */
-.ds-wrap{padding:10px 12px 8px;flex-shrink:0;}
-.ds-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
-.ds-lbl{font-size:9px;letter-spacing:.3em;color:var(--mt);text-transform:uppercase;}
-.live{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--gr);}
+/* Doctor card */
+.ds{padding:8px 12px 6px;flex-shrink:0;}
+.ds-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.ds-lbl{font-size:8px;letter-spacing:.28em;color:var(--mt);text-transform:uppercase;}
+.live{display:flex;align-items:center;gap:4px;font-size:8px;color:var(--gr);}
 .live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gr);animation:pulse 1.4s ease infinite;}
-@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,255,136,.4)}50%{opacity:.4;box-shadow:0 0 0 5px rgba(0,255,136,0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 
-.dcard{border-radius:var(--r);border:2px solid;padding:12px 16px;display:flex;align-items:center;gap:14px;transition:all .35s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;}
-.dcard::before{content:'';position:absolute;inset:0;opacity:.1;transition:opacity .35s;}
+.dcard{border-radius:var(--r);border:2px solid;padding:10px 14px;display:flex;align-items:center;gap:12px;transition:all .35s cubic-bezier(.16,1,.3,1);position:relative;overflow:hidden;}
+.dcard::before{content:'';position:absolute;inset:0;opacity:.1;pointer-events:none;}
+.dc-free{border-color:var(--gr);}.dc-free::before{background:radial-gradient(circle at 20% 50%,var(--gr),transparent 55%);}
+.dc-ending{border-color:var(--yl);}.dc-ending::before{background:radial-gradient(circle at 20% 50%,var(--yl),transparent 55%);}
+.dc-busy{border-color:var(--rd);animation:fbd 1.4s ease infinite;}.dc-busy::before{background:radial-gradient(circle at 20% 50%,var(--rd),transparent 55%);}
+@keyframes fbd{0%,100%{box-shadow:0 0 14px rgba(255,51,85,.2)}50%{box-shadow:0 0 28px rgba(255,51,85,.45)}}
+.dc-wait{border-color:var(--or);}.dc-wait::before{background:radial-gradient(circle at 20% 50%,var(--or),transparent 55%);}
+.dc-break{border-color:var(--pu);}.dc-break::before{background:radial-gradient(circle at 20% 50%,var(--pu),transparent 55%);}
 
-.dc-free{border-color:var(--gr);}
-.dc-free::before{background:radial-gradient(circle at 25% 50%,var(--gr),transparent 55%);}
-.dc-ending{border-color:var(--yl);}
-.dc-ending::before{background:radial-gradient(circle at 25% 50%,var(--yl),transparent 55%);}
-.dc-busy{border-color:var(--rd);animation:fbd 1.4s ease infinite;}
-.dc-busy::before{background:radial-gradient(circle at 25% 50%,var(--rd),transparent 55%);}
-@keyframes fbd{0%,100%{box-shadow:0 0 16px rgba(255,51,85,.2)}50%{box-shadow:0 0 32px rgba(255,51,85,.45)}}
-.dc-wait{border-color:var(--or);}
-.dc-wait::before{background:radial-gradient(circle at 25% 50%,var(--or),transparent 55%);}
-.dc-break{border-color:var(--pu);}
-.dc-break::before{background:radial-gradient(circle at 25% 50%,var(--pu),transparent 55%);}
-
-.dem{font-size:40px;line-height:1;flex-shrink:0;position:relative;z-index:1;}
+.dem{font-size:36px;line-height:1;flex-shrink:0;position:relative;z-index:1;}
 .dinfo{flex:1;position:relative;z-index:1;}
-.dinf-lbl{font-size:9px;letter-spacing:.18em;color:var(--mt);text-transform:uppercase;margin-bottom:3px;}
-.dstatus{font-family:'Unbounded',sans-serif;font-size:20px;font-weight:900;line-height:1.1;}
-.dtm{font-size:10px;color:var(--mt);margin-top:4px;}
+.dinf-lbl{font-size:8px;letter-spacing:.16em;color:var(--mt);text-transform:uppercase;margin-bottom:2px;}
+.dst{font-family:'Unbounded',sans-serif;font-size:18px;font-weight:900;line-height:1.1;}
+.dtm{font-size:9px;color:var(--mt);margin-top:3px;}
 
 /* Divider */
-.div{height:1px;background:var(--bd);margin:0 12px;}
+.div{height:1px;background:var(--bd);margin:0 12px;flex-shrink:0;}
 
 /* Nurse buttons */
-.nb-wrap{padding:8px 12px;flex-shrink:0;}
-.nb-lbl{font-size:9px;letter-spacing:.28em;color:var(--mt);text-transform:uppercase;margin-bottom:7px;}
-.nbg{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
-.nb{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;border:2px solid var(--bd);background:var(--s1);cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace;color:var(--tx);text-align:left;user-select:none;}
+.nb-wrap{padding:6px 12px;flex-shrink:0;}
+.nb-lbl{font-size:8px;letter-spacing:.25em;color:var(--mt);text-transform:uppercase;margin-bottom:6px;}
+.nbg{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.nb{display:flex;align-items:center;gap:9px;padding:10px 11px;border-radius:10px;border:2px solid var(--bd);background:var(--s1);cursor:pointer;transition:all .2s;font-family:'JetBrains Mono',monospace;color:var(--tx);text-align:left;user-select:none;}
 .nb:active{transform:scale(.97);}
-.nb.active{box-shadow:0 0 20px currentColor;transform:scale(1.02);}
-.nb .ne{font-size:24px;flex-shrink:0;}
-.nb .nt{font-size:11px;font-weight:600;line-height:1.3;}
-.nb .ns{font-size:9px;color:var(--mt);margin-top:1px;}
-
+.nb.active{box-shadow:0 0 18px currentColor;transform:scale(1.02);}
+.nb .ne{font-size:22px;flex-shrink:0;}
+.nb .nt{font-size:11px;font-weight:600;line-height:1.25;}
+.nb .ns{font-size:8px;color:var(--mt);margin-top:1px;}
 .n-none{color:var(--mt);}
 .n-arrived{color:var(--yl);}.n-arrived.active{border-color:var(--yl);background:rgba(255,204,0,.07);}
 .n-nervous{color:var(--rd);}.n-nervous.active{border-color:var(--rd);background:rgba(255,51,85,.09);animation:fnv 1s ease infinite;}
-@keyframes fnv{0%,100%{background:rgba(255,51,85,.09)}50%{background:rgba(255,51,85,.19)}}
+@keyframes fnv{0%,100%{background:rgba(255,51,85,.09)}50%{background:rgba(255,51,85,.2)}}
 .n-gone{color:var(--gr);}.n-gone.active{border-color:var(--gr);background:rgba(0,255,136,.07);}
-.n-none.active{border-color:var(--mt);background:rgba(58,80,112,.15);}
+.n-none.active{border-color:var(--mt);background:rgba(58,80,112,.14);}
 
 /* Schedule */
-.sc-wrap{padding:6px 12px 4px;display:flex;flex-direction:column;min-height:0;overflow:hidden;flex-shrink:0;max-height:160px;}
-.sc-lbl{font-size:9px;letter-spacing:.28em;color:var(--mt);text-transform:uppercase;margin-bottom:5px;flex-shrink:0;}
-.sc-list{overflow-y:auto;display:flex;flex-direction:column;gap:4px;}
+.sc{padding:5px 12px 4px;flex-shrink:0;}
+.sc-lbl{font-size:8px;letter-spacing:.25em;color:var(--mt);text-transform:uppercase;margin-bottom:5px;}
+.sc-list{display:flex;flex-direction:column;gap:3px;max-height:130px;overflow-y:auto;}
 .sc-list::-webkit-scrollbar{width:2px;}
 .sc-list::-webkit-scrollbar-thumb{background:var(--bd);}
-.si{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:7px;border:1px solid var(--bd);background:var(--s1);font-size:11px;flex-shrink:0;}
+.si{display:flex;align-items:center;gap:7px;padding:5px 9px;border-radius:7px;border:1px solid var(--bd);background:var(--s1);font-size:11px;flex-shrink:0;}
 .si.cur{border-color:var(--bl);background:rgba(0,136,255,.07);}
-.si.done{opacity:.33;}
+.si.done{opacity:.3;}
 .sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.stm{color:var(--mt);width:38px;flex-shrink:0;}
+.stm{color:var(--mt);width:36px;flex-shrink:0;}
 .scd{flex:1;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .sst{font-size:13px;}
 
 /* Chat */
-.chat-wrap{display:flex;flex-direction:column;min-height:0;overflow:hidden;padding:6px 12px 4px;}
-.ch-lbl{font-size:9px;letter-spacing:.28em;color:var(--mt);text-transform:uppercase;margin-bottom:5px;flex-shrink:0;}
-.ch-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;min-height:0;}
+.chat{display:flex;flex-direction:column;flex:1;min-height:0;padding:5px 12px 4px;}
+.ch-lbl{font-size:8px;letter-spacing:.25em;color:var(--mt);text-transform:uppercase;margin-bottom:5px;flex-shrink:0;}
+.ch-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px;min-height:0;}
 .ch-msgs::-webkit-scrollbar{width:2px;}
 .ch-msgs::-webkit-scrollbar-thumb{background:var(--bd);}
 .msg{display:flex;flex-direction:column;gap:2px;max-width:84%;}
 .msg.me{align-self:flex-end;align-items:flex-end;}
 .msg.doc{align-self:flex-start;align-items:flex-start;}
-.bbl{padding:7px 11px;border-radius:11px;font-size:13px;line-height:1.4;word-break:break-word;}
-.me .bbl{background:linear-gradient(135deg,#005588,#0099cc);color:#fff;border-bottom-right-radius:3px;}
-.doc .bbl{background:var(--s2);border:1px solid var(--bd);border-bottom-left-radius:3px;}
-.mm{font-size:9px;color:var(--mt);padding:0 3px;}
-
-.cq{display:flex;gap:5px;overflow-x:auto;padding:4px 0 2px;flex-shrink:0;}
+.bbl{padding:6px 10px;border-radius:10px;font-size:13px;line-height:1.4;word-break:break-word;}
+.me .bbl{background:linear-gradient(135deg,#005588,#0099cc);color:#fff;border-bottom-right-radius:2px;}
+.doc .bbl{background:var(--s2);border:1px solid var(--bd);border-bottom-left-radius:2px;}
+.mm{font-size:8px;color:var(--mt);padding:0 3px;}
+.cq{display:flex;gap:4px;overflow-x:auto;padding:3px 0 2px;flex-shrink:0;}
 .cq::-webkit-scrollbar{display:none;}
-.qp{flex-shrink:0;padding:4px 10px;border-radius:16px;border:1px solid var(--bd);font-size:11px;cursor:pointer;color:var(--mt);background:var(--s2);white-space:nowrap;font-family:'JetBrains Mono',monospace;transition:all .15s;}
+.qp{flex-shrink:0;padding:3px 9px;border-radius:14px;border:1px solid var(--bd);font-size:11px;cursor:pointer;color:var(--mt);background:var(--s2);white-space:nowrap;font-family:'JetBrains Mono',monospace;}
 .qp:active{background:rgba(0,136,255,.18);color:var(--tx);}
 
-/* Chat input */
-.cin-row{display:flex;gap:7px;padding:8px 12px 12px;flex-shrink:0;background:var(--bg);border-top:1px solid var(--bd);}
-.cin{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:10px 13px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;transition:border-color .2s;}
+/* Input */
+.cin-row{display:flex;gap:6px;padding:7px 12px 10px;flex-shrink:0;background:var(--bg);border-top:1px solid var(--bd);}
+.cin{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:9px 12px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;transition:border-color .2s;}
 .cin:focus{border-color:var(--bl);}
 .cin::placeholder{color:var(--mt);}
-.csb{background:linear-gradient(135deg,#005588,#0099cc);border:none;border-radius:9px;padding:10px 16px;color:#fff;cursor:pointer;font-size:16px;flex-shrink:0;}
+.csb{background:linear-gradient(135deg,#005588,#0099cc);border:none;border-radius:9px;padding:9px 15px;color:#fff;cursor:pointer;font-size:16px;flex-shrink:0;}
 
-.empty{display:flex;align-items:center;justify-content:center;color:var(--mt);font-size:10px;padding:12px;text-align:center;}
+.empty{color:var(--mt);font-size:10px;padding:10px;text-align:center;}
 
-/* Mobile: allow scroll if content overflows */
-@media(max-width:400px){
-  .clock{font-size:18px;}
-  .dstatus{font-size:17px;}
-  .dem{font-size:34px;}
-}
+@media(max-width:400px){.clock{font-size:17px;}.dst{font-size:15px;}.dem{font-size:30px;}}
 </style>
 </head>
 <body>
 <div class="app">
 
-  <!-- Top -->
   <div class="top">
     <div><div class="clock" id="clk">00:00</div><div class="dstr" id="dstr">—</div></div>
-    <div class="logo-r"><div>Медсестра</div><div>Dr. Lomanov CRM</div></div>
+    <div class="logo-r"><div>Медсестра</div><div>Dr. Lomanov</div></div>
   </div>
 
-  <!-- Doctor status -->
-  <div class="ds-wrap">
+  <div class="ds">
     <div class="ds-top">
       <div class="ds-lbl">Статус лікаря</div>
       <div class="live">REAL-TIME</div>
@@ -145,7 +128,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
       <div class="dem" id="dem">🟢</div>
       <div class="dinfo">
         <div class="dinf-lbl">Доктор Ломанов</div>
-        <div class="dstatus" id="dst">Вільний</div>
+        <div class="dst" id="dst">Вільний</div>
         <div class="dtm" id="dtm">Очікування...</div>
       </div>
     </div>
@@ -153,15 +136,14 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
 
   <div class="div"></div>
 
-  <!-- Nurse buttons -->
   <div class="nb-wrap">
-    <div class="nb-lbl">Мій статус реєстратури</div>
+    <div class="nb-lbl">Мій статус</div>
     <div class="nbg">
       <button class="nb n-none active" data-ns="none" onclick="setN('none')">
         <span class="ne">👤</span><div><div class="nt">Пацієнтів немає</div><div class="ns">Вільна</div></div>
       </button>
       <button class="nb n-arrived" data-ns="arrived" onclick="setN('arrived')">
-        <span class="ne">🔔</span><div><div class="nt">Прийшов пацієнт</div><div class="ns">Готую</div></div>
+        <span class="ne">🔔</span><div><div class="nt">Прийшов пацієнт</div><div class="ns">Готую до прийому</div></div>
       </button>
       <button class="nb n-nervous" data-ns="nervous" onclick="setN('nervous')">
         <span class="ne">😤</span><div><div class="nt">Нервує!</div><div class="ns">⚠️ Допоможіть</div></div>
@@ -172,14 +154,16 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
     </div>
   </div>
 
-  <!-- Schedule -->
-  <div class="sc-wrap">
-    <div class="sc-lbl">📅 Розклад сьогодні</div>
+  <div class="div"></div>
+
+  <div class="sc">
+    <div class="sc-lbl">📅 Розклад</div>
     <div class="sc-list" id="sl"><div class="empty">Завантаження...</div></div>
   </div>
 
-  <!-- Chat -->
-  <div class="chat-wrap">
+  <div class="div"></div>
+
+  <div class="chat">
     <div class="ch-lbl">💬 Чат з лікарем</div>
     <div class="ch-msgs" id="cm"><div class="empty">Завантаження...</div></div>
     <div class="cq">
@@ -191,7 +175,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
     </div>
   </div>
 
-  <!-- Input -->
   <div class="cin-row">
     <input class="cin" id="cin" placeholder="Написати лікарю..." onkeydown="if(event.key==='Enter')cs()">
     <button class="csb" onclick="cs()">↑</button>
@@ -211,7 +194,8 @@ const db=getDatabase(initializeApp({
   appId:"1:727432965889:web:33825368d0ef0dbb03f500"
 }));
 
-const rD=ref(db,'status/doctor'),rN=ref(db,'status/nurse'),rC=ref(db,'chat'),rS=ref(db,'schedule/today');
+const rD=ref(db,'status/doctor'),rN=ref(db,'status/nurse'),
+      rC=ref(db,'chat'),rS=ref(db,'schedule/today');
 
 const dCfg={
   free:  {e:'🟢',l:'Вільний',  cl:'dc-free'},
@@ -224,21 +208,21 @@ const tC={primary:'#ff4444',repeat:'#44cc88',derm:'#44aaff',removal:'#ffaa00',ma
 const stE={waiting:'⏰',arrived:'🔔',inroom:'🩺',done:'✅',missed:'❌'};
 
 onValue(rD,snap=>{
-  const d=snap.val(); if(!d)return;
-  const c=dCfg[d.status]||dCfg.free, dc=document.getElementById('dc');
+  const d=snap.val();if(!d)return;
+  const c=dCfg[d.status]||dCfg.free,dc=document.getElementById('dc');
   dc.className='dcard '+c.cl;
   document.getElementById('dem').textContent=c.e;
   document.getElementById('dst').textContent=c.l;
   if(d.timestamp) document.getElementById('dtm').textContent=
-    'Оновлено о '+new Date(d.timestamp).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+    'о '+new Date(d.timestamp).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
 });
 
 onValue(rC,snap=>{
-  const msgs=[]; snap.forEach(c=>msgs.push({id:c.key,...c.val()}));
-  const box=document.getElementById('cm'); box.innerHTML='';
+  const msgs=[];snap.forEach(c=>msgs.push({id:c.key,...c.val()}));
+  const box=document.getElementById('cm');box.innerHTML='';
   if(!msgs.length){box.innerHTML='<div class="empty">Чат порожній</div>';return;}
   msgs.slice(-30).forEach(m=>{
-    const me=m.sender==='nurse', el=document.createElement('div');
+    const me=m.sender==='nurse',el=document.createElement('div');
     el.className='msg '+(me?'me':'doc');
     const t=m.timestamp?new Date(m.timestamp).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'}):'';
     el.innerHTML=`<div class="bbl">${esc(m.text)}</div><div class="mm">${me?'Ви':'Лікар'} · ${t}</div>`;
@@ -248,7 +232,7 @@ onValue(rC,snap=>{
 });
 
 onValue(rS,snap=>{
-  const d=snap.val(), list=document.getElementById('sl'); list.innerHTML='';
+  const d=snap.val(),list=document.getElementById('sl');list.innerHTML='';
   if(!d){list.innerHTML='<div class="empty">Розклад порожній</div>';return;}
   const appts=Object.entries(d).map(([id,v])=>({id,...v})).sort((a,b)=>a.time.localeCompare(b.time));
   const now=new Date().toTimeString().slice(0,5);
@@ -268,8 +252,9 @@ window.setN=s=>{
 
 window.cs=()=>{
   const i=document.getElementById('cin'),t=i.value.trim();
-  if(!t)return; i.value='';
-  push(rC,{sender:'nurse',text:t,timestamp:Date.now()});
+  if(!t)return;i.value='';
+  push(rC,{sender:'nurse',text:t,timestamp:Date.now()})
+    .catch(e=>console.error('Chat error:',e));
 };
 window.sq=t=>{document.getElementById('cin').value=t;window.cs();};
 

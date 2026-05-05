@@ -6,155 +6,221 @@
 <title>Лікар — Dr. Lomanov</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Unbounded:wght@300;400;700&display=swap');
-
-:root {
-  --bg:#080d14; --s1:#0f1923; --s2:#162030; --bd:#1e3050;
-  --ac:#00d4ff; --ac2:#0066ff;
-  --gr:#00ff88; --rd:#ff3355; --yl:#ffcc00; --or:#ff8800; --pu:#bb88ff;
-  --tx:#ddeeff; --mt:#3a5575; --r:10px;
+:root{
+  --bg:#070e17;--s1:#0f1b28;--s2:#162232;--bd:#1e3050;
+  --ac:#00d4ff;--ac2:#0066ff;
+  --gr:#00ff88;--rd:#ff3355;--yl:#ffcc00;--or:#ff8800;--pu:#bb88ff;
+  --tx:#ddeeff;--mt:#3a5575;--r:9px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrains Mono',monospace;overflow:hidden;}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrains Mono',monospace;}
 
-.app{display:grid;height:100vh;grid-template-rows:44px 36px 1fr;}
-
-/* Topbar */
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--bd);background:var(--s1);}
-.logo{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;color:var(--ac);letter-spacing:.2em;}
-.clk{font-size:11px;color:var(--mt);letter-spacing:.08em;margin-left:12px;}
-.live{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--gr);letter-spacing:.2em;}
-.live::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--gr);animation:blink 1.4s ease infinite;}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-
-/* Stats */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--bd);background:var(--s1);}
-.stat{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;border-right:1px solid var(--bd);}
-.stat:last-child{border-right:none;}
-.sv{font-family:'Unbounded',sans-serif;font-size:15px;font-weight:700;color:var(--ac);}
-.sl{font-size:9px;color:var(--mt);letter-spacing:.1em;text-transform:uppercase;}
-
-/* Main grid */
-.main{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:68px 1fr 1fr;gap:8px;padding:8px;overflow:hidden;min-height:0;}
-
-.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);display:flex;flex-direction:column;overflow:hidden;min-height:0;}
-.clabel{font-size:9px;letter-spacing:.28em;color:var(--mt);text-transform:uppercase;padding:6px 10px 5px;border-bottom:1px solid var(--bd);flex-shrink:0;}
-
-/* Nurse (full width row 1) */
-.card-nurse{grid-column:1/-1;flex-direction:row;align-items:stretch;}
-.nlabel{font-size:9px;letter-spacing:.2em;color:var(--mt);text-transform:uppercase;padding:0 12px;width:130px;flex-shrink:0;border-right:1px solid var(--bd);display:flex;align-items:center;}
-.ndisp{flex:1;display:flex;align-items:center;gap:12px;padding:0 16px;transition:background .4s;}
-.ni{font-size:28px;flex-shrink:0;}
-.nt{font-family:'Unbounded',sans-serif;font-size:15px;font-weight:700;}
-.nsub{font-size:10px;color:var(--mt);margin-top:2px;}
-.ntm{margin-left:auto;font-size:10px;color:var(--mt);}
-
-.ns-none{background:rgba(58,85,117,.07);}
-.ns-arrived{background:rgba(255,204,0,.09);border-color:var(--yl)!important;}
-.ns-nervous{background:rgba(255,51,85,.13);border-color:var(--rd)!important;animation:nflash 1.2s ease infinite;}
-.ns-gone{background:rgba(0,255,136,.07);border-color:var(--gr)!important;}
-@keyframes nflash{0%,100%{background:rgba(255,51,85,.13)}50%{background:rgba(255,51,85,.26)}}
-
-/* My status (row 2 col 1) */
-.sg{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:7px;flex:1;}
-.sb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 2px;border-radius:7px;border:1px solid var(--bd);background:var(--s2);cursor:pointer;transition:all .17s;font-family:'JetBrains Mono',monospace;color:var(--tx);font-size:9px;letter-spacing:.03em;text-align:center;user-select:none;}
-.sb:hover{border-color:var(--ac2);transform:translateY(-1px);}
-.sb.active{box-shadow:0 0 14px currentColor;transform:scale(1.04);border-color:currentColor;}
-.sb .em{font-size:18px;}
-.sb .lb{color:var(--mt);}
-.sb.active .lb{color:inherit;}
-.sf{color:var(--gr);} .se{color:var(--yl);} .sbu{color:var(--rd);} .sw{color:var(--or);} .sbr{color:var(--pu);}
-
-/* Chat (row 2 col 2) */
-.msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px;padding:7px;min-height:0;}
-.msgs::-webkit-scrollbar{width:3px;}
-.msgs::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
-.msg{display:flex;flex-direction:column;gap:2px;max-width:86%;}
-.msg.me{align-self:flex-end;align-items:flex-end;}
-.msg.her{align-self:flex-start;align-items:flex-start;}
-.bbl{padding:5px 9px;border-radius:9px;font-size:12px;line-height:1.4;word-break:break-word;}
-.me .bbl{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;border-bottom-right-radius:3px;}
-.her .bbl{background:var(--s2);border:1px solid var(--bd);border-bottom-left-radius:3px;}
-.mm{font-size:9px;color:var(--mt);padding:0 3px;}
-
-.cq{display:flex;gap:4px;padding:4px 7px;overflow-x:auto;flex-shrink:0;border-top:1px solid var(--bd);}
-.cq::-webkit-scrollbar{display:none;}
-.qp{flex-shrink:0;padding:3px 8px;border-radius:12px;border:1px solid var(--bd);font-size:10px;cursor:pointer;color:var(--mt);background:var(--s2);white-space:nowrap;font-family:'JetBrains Mono',monospace;transition:all .15s;}
-.qp:hover{border-color:var(--ac2);color:var(--tx);}
-
-.crow{display:flex;gap:5px;padding:5px 7px;border-top:1px solid var(--bd);flex-shrink:0;}
-.cin{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:6px 9px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;transition:border-color .2s;}
-.cin:focus{border-color:var(--ac2);}
-.cin::placeholder{color:var(--mt);}
-.csb{background:linear-gradient(135deg,var(--ac2),var(--ac));border:none;border-radius:6px;padding:6px 11px;color:#fff;cursor:pointer;font-size:14px;flex-shrink:0;}
-
-/* Schedule (row 3, full width) */
-.card-sched{grid-column:1/-1;}
-.sl-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:3px;padding:5px 7px;min-height:0;}
-.sl-list::-webkit-scrollbar{width:3px;}
-.sl-list::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
-.appt{display:flex;align-items:center;gap:7px;padding:5px 9px;border-radius:6px;border:1px solid var(--bd);background:var(--s2);flex-shrink:0;}
-.appt.current{border-color:var(--ac);box-shadow:0 0 9px rgba(0,212,255,.14);}
-.appt.done{opacity:.35;}
-.appt.missed{border-color:var(--rd);}
-.adot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-.atm{font-size:11px;color:var(--mt);width:40px;flex-shrink:0;}
-.acd{flex:1;font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.atp{font-size:9px;color:var(--mt);flex-shrink:0;}
-.ast{font-size:15px;cursor:pointer;flex-shrink:0;transition:transform .15s;}
-.ast:hover{transform:scale(1.3);}
-
-.empty{display:flex;align-items:center;justify-content:center;color:var(--mt);font-size:11px;padding:14px;text-align:center;letter-spacing:.05em;}
+/* ── DESKTOP: fixed 100vh, no body scroll ── */
+@media(min-width:681px){
+  body{overflow:hidden;}
+  .app{height:100vh;display:flex;flex-direction:column;}
+  .main{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:60px 1fr 1fr;gap:8px;padding:8px;overflow:hidden;}
+  .card{display:flex;flex-direction:column;overflow:hidden;min-height:0;}
+  .msgs{flex:1;overflow-y:auto;min-height:0;}
+  .sl-list{flex:1;overflow-y:auto;min-height:0;}
+}
 
 /* ── MOBILE ── */
 @media(max-width:680px){
-  html,body{overflow:auto;}
-  .app{height:auto;min-height:100vh;grid-template-rows:auto auto auto;overflow:visible;}
-  .main{grid-template-columns:1fr;grid-template-rows:auto auto auto auto;overflow:visible;height:auto;}
-  .card-nurse{flex-direction:column;height:auto;}
-  .nlabel{width:100%;height:auto;padding:7px 12px;border-right:none;border-bottom:1px solid var(--bd);}
-  .ndisp{padding:10px 14px;}
-  .card{height:auto;min-height:0;}
-  .msgs{max-height:180px;}
-  .sl-list{max-height:260px;}
-  .card-sched{grid-column:1;}
-  .nt{font-size:14px;}
-  .sv{font-size:14px;}
+  body{overflow-y:auto;}
+  .app{min-height:100vh;}
+  .main{display:flex;flex-direction:column;gap:8px;padding:8px;}
+  .card{display:flex;flex-direction:column;}
+  .msgs{max-height:180px;overflow-y:auto;}
+  .sl-list{max-height:240px;overflow-y:auto;}
 }
+
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:40px;border-bottom:1px solid var(--bd);background:var(--s1);flex-shrink:0;}
+.logo{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;color:var(--ac);letter-spacing:.18em;}
+.clk{font-size:11px;color:var(--mt);margin-left:10px;}
+.live{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--gr);}
+.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gr);animation:bl 1.4s ease infinite;}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(6,1fr);height:32px;border-bottom:1px solid var(--bd);background:var(--s1);flex-shrink:0;}
+.st{display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid var(--bd);}
+.st:last-child{border-right:none;}
+.sv{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;color:var(--ac);line-height:1;}
+.sl{font-size:8px;color:var(--mt);letter-spacing:.08em;text-transform:uppercase;}
+
+/* Card base */
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);}
+.cl{font-size:8px;letter-spacing:.3em;color:var(--mt);text-transform:uppercase;padding:5px 10px 4px;border-bottom:1px solid var(--bd);flex-shrink:0;}
+
+/* ── ROW 1: Nurse + Next patient ── */
+.card-nurse{grid-column:1;flex-direction:row;align-items:stretch;}
+.nlbl{font-size:8px;letter-spacing:.2em;color:var(--mt);text-transform:uppercase;padding:0 10px;width:110px;flex-shrink:0;border-right:1px solid var(--bd);display:flex;align-items:center;}
+.ndisp{flex:1;display:flex;align-items:center;gap:10px;padding:0 12px;transition:background .4s;}
+.ni{font-size:24px;flex-shrink:0;}
+.nt{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;}
+.nsub{font-size:9px;color:var(--mt);margin-top:1px;}
+.ntm{margin-left:auto;font-size:9px;color:var(--mt);}
+.ns-none{background:rgba(58,85,117,.07);}
+.ns-arrived{background:rgba(255,204,0,.09);border-color:var(--yl)!important;}
+.ns-nervous{background:rgba(255,51,85,.13);border-color:var(--rd)!important;animation:nf 1.2s ease infinite;}
+.ns-gone{background:rgba(0,255,136,.07);border-color:var(--gr)!important;}
+@keyframes nf{0%,100%{background:rgba(255,51,85,.13)}50%{background:rgba(255,51,85,.27)}}
+
+/* Next patient card */
+.card-next{grid-column:2;flex-direction:row;align-items:center;gap:12px;padding:0 14px;}
+.next-time{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:700;color:var(--ac);flex-shrink:0;min-width:60px;}
+.next-div{width:1px;height:34px;background:var(--bd);flex-shrink:0;}
+.next-info{flex:1;min-width:0;}
+.next-code{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.next-type{font-size:9px;color:var(--mt);margin-top:2px;letter-spacing:.05em;}
+.next-countdown{font-size:9px;color:var(--or);margin-left:auto;flex-shrink:0;text-align:right;}
+
+/* Timer badge */
+.timer-badge{display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.timer-badge.idle{background:var(--s2);border:1px solid var(--bd);color:var(--mt);}
+.timer-badge.running{background:rgba(0,255,136,.12);border:1px solid var(--gr);color:var(--gr);}
+.timer-badge.over{background:rgba(255,51,85,.15);border:1px solid var(--rd);color:var(--rd);animation:tb 1s ease infinite;}
+@keyframes tb{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* ── ROW 2: My status + Chat ── */
+.sg{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:6px;flex:1;}
+.sb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px;border-radius:6px;border:1px solid var(--bd);background:var(--s2);cursor:pointer;transition:all .17s;font-family:'JetBrains Mono',monospace;color:var(--tx);font-size:8px;letter-spacing:.03em;text-align:center;user-select:none;}
+.sb:hover{border-color:var(--ac2);transform:translateY(-1px);}
+.sb.active{box-shadow:0 0 12px currentColor;transform:scale(1.04);border-color:currentColor;}
+.sb .em{font-size:17px;}.sb .lb{color:var(--mt);}.sb.active .lb{color:inherit;}
+.sf{color:var(--gr);}.se{color:var(--yl);}.sbu{color:var(--rd);}.sw{color:var(--or);}.sbr{color:var(--pu);}
+
+/* Chat */
+.msgs::-webkit-scrollbar{width:3px;}
+.msgs::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
+.msgs{padding:6px;display:flex;flex-direction:column;gap:4px;}
+.msg{display:flex;flex-direction:column;gap:2px;max-width:86%;}
+.msg.me{align-self:flex-end;align-items:flex-end;}
+.msg.her{align-self:flex-start;align-items:flex-start;}
+.bbl{padding:5px 9px;border-radius:8px;font-size:12px;line-height:1.4;word-break:break-word;}
+.me .bbl{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;border-bottom-right-radius:2px;}
+.her .bbl{background:var(--s2);border:1px solid var(--bd);border-bottom-left-radius:2px;}
+.mm{font-size:8px;color:var(--mt);padding:0 3px;}
+.cq{display:flex;gap:4px;padding:3px 6px;overflow-x:auto;flex-shrink:0;border-top:1px solid var(--bd);}
+.cq::-webkit-scrollbar{display:none;}
+.qp{flex-shrink:0;padding:2px 8px;border-radius:10px;border:1px solid var(--bd);font-size:10px;cursor:pointer;color:var(--mt);background:var(--s2);white-space:nowrap;font-family:'JetBrains Mono',monospace;transition:all .15s;}
+.qp:hover{border-color:var(--ac2);color:var(--tx);}
+.crow{display:flex;gap:4px;padding:4px 6px;border-top:1px solid var(--bd);flex-shrink:0;}
+.cin{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:5px 8px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;transition:border-color .2s;}
+.cin:focus{border-color:var(--ac2);}
+.cin::placeholder{color:var(--mt);}
+.csb{background:linear-gradient(135deg,var(--ac2),var(--ac));border:none;border-radius:6px;padding:5px 10px;color:#fff;cursor:pointer;font-size:13px;flex-shrink:0;}
+
+/* ── ROW 3: Finance + Schedule ── */
+/* Finance */
+.fin-body{flex:1;display:flex;flex-direction:column;gap:4px;padding:6px;overflow:hidden;}
+.fin-row{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
+.fin-box{background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:6px 8px;text-align:center;}
+.fin-box.official{border-color:rgba(0,212,255,.3);}
+.fin-box.real{border-color:rgba(0,255,136,.3);}
+.fin-lbl{font-size:8px;color:var(--mt);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;}
+.fin-val{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;}
+.fin-box.official .fin-val{color:var(--ac);}
+.fin-box.real .fin-val{color:var(--gr);}
+.fin-btns{display:flex;gap:4px;overflow-x:auto;flex-shrink:0;}
+.fin-btns::-webkit-scrollbar{display:none;}
+.fb{flex-shrink:0;padding:4px 10px;border-radius:6px;border:1px solid var(--bd);font-size:10px;cursor:pointer;color:var(--mt);background:var(--s2);white-space:nowrap;font-family:'JetBrains Mono',monospace;transition:all .15s;}
+.fb:hover{border-color:var(--ac);color:var(--tx);}
+.fin-manual{display:flex;gap:4px;flex-shrink:0;}
+.fin-input{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;}
+.fin-input:focus{border-color:var(--ac);}
+.fin-input::placeholder{color:var(--mt);}
+.fin-add{background:rgba(0,255,136,.15);border:1px solid rgba(0,255,136,.4);border-radius:6px;padding:4px 10px;color:var(--gr);cursor:pointer;font-size:11px;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+.fin-add:hover{background:rgba(0,255,136,.25);}
+
+/* Schedule */
+.sl-list{display:flex;flex-direction:column;gap:3px;padding:5px 6px;}
+.sl-list::-webkit-scrollbar{width:3px;}
+.sl-list::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
+.appt{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;border:1px solid var(--bd);background:var(--s2);flex-shrink:0;transition:all .2s;cursor:pointer;}
+.appt:hover{border-color:var(--ac2);}
+.appt.current{border-color:var(--ac);background:rgba(0,212,255,.06);box-shadow:0 0 8px rgba(0,212,255,.12);}
+.appt.done{opacity:.3;}
+.appt.missed{border-color:var(--rd);}
+.adot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.atm{font-size:10px;color:var(--mt);width:38px;flex-shrink:0;}
+.acd{flex:1;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.atp{font-size:8px;color:var(--mt);flex-shrink:0;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ast{font-size:14px;cursor:pointer;flex-shrink:0;transition:transform .15s;}
+.ast:hover{transform:scale(1.3);}
+
+.empty{display:flex;align-items:center;justify-content:center;color:var(--mt);font-size:10px;padding:14px;text-align:center;}
+
+/* Checklist modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;}
+.modal.open{display:flex;}
+.modal-box{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:16px;min-width:280px;max-width:340px;}
+.modal-title{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;color:var(--ac);}
+.chk-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);cursor:pointer;}
+.chk-item:last-child{border-bottom:none;}
+.chk-box{width:16px;height:16px;border-radius:3px;border:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.chk-item.checked .chk-box{background:var(--gr);border-color:var(--gr);}
+.chk-item.checked .chk-box::after{content:'✓';font-size:10px;color:#000;}
+.chk-item.checked .chk-txt{color:var(--mt);text-decoration:line-through;}
+.chk-txt{font-size:12px;}
+.modal-close{margin-top:12px;width:100%;padding:8px;background:var(--s2);border:1px solid var(--bd);border-radius:7px;color:var(--tx);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;}
 </style>
 </head>
 <body>
 <div class="app">
 
+  <!-- Topbar -->
   <div class="topbar">
     <div style="display:flex;align-items:center">
       <div class="logo">DR. LOMANOV</div>
       <div class="clk" id="clk"></div>
     </div>
-    <div class="live">LIVE</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="timer-badge idle" id="timerBadge" onclick="toggleTimer()">⏱ 00:00</div>
+      <div class="live">LIVE</div>
+    </div>
   </div>
 
+  <!-- Stats -->
   <div class="stats">
-    <div class="stat"><div class="sv" id="sT">—</div><div class="sl">Сьогодні</div></div>
-    <div class="stat"><div class="sv" id="sD">—</div><div class="sl">Прийнято</div></div>
-    <div class="stat"><div class="sv" id="sL">—</div><div class="sl">Залишилось</div></div>
-    <div class="stat"><div class="sv" id="sN">—</div><div class="sl">Наступний</div></div>
+    <div class="st"><div class="sv" id="sT">—</div><div class="sl">Всього</div></div>
+    <div class="st"><div class="sv" id="sD">—</div><div class="sl">Прийнято</div></div>
+    <div class="st"><div class="sv" id="sL">—</div><div class="sl">Залишилось</div></div>
+    <div class="st"><div class="sv" id="sN">—</div><div class="sl">Наступний</div></div>
+    <div class="st"><div class="sv" id="sFin" style="color:var(--gr)">0</div><div class="sl">Готівка ₴</div></div>
+    <div class="st"><div class="sv" id="sOff" style="color:var(--ac)">0</div><div class="sl">Офіційно ₴</div></div>
   </div>
 
+  <!-- Main -->
   <div class="main">
 
-    <!-- Nurse -->
+    <!-- Nurse status -->
     <div class="card card-nurse">
-      <div class="nlabel">Реєстратура</div>
+      <div class="nlbl">Реєстратура</div>
       <div class="ndisp ns-none" id="nd">
         <div class="ni" id="ni">👤</div>
-        <div><div class="nt" id="ntx">Пацієнтів немає</div><div class="nsub" id="nsb">Медсестра не відзначилась</div></div>
+        <div><div class="nt" id="ntx">Немає пацієнтів</div><div class="nsub" id="nsb">Очікування</div></div>
         <div class="ntm" id="ntm"></div>
       </div>
     </div>
 
+    <!-- Next patient -->
+    <div class="card card-next" id="nextCard">
+      <div class="next-time" id="nextTime">—</div>
+      <div class="next-div"></div>
+      <div class="next-info">
+        <div class="next-code" id="nextCode">Немає записів</div>
+        <div class="next-type" id="nextType">—</div>
+      </div>
+      <div class="next-countdown" id="nextCountdown"></div>
+      <button onclick="openChecklist()" style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);border-radius:6px;padding:4px 8px;color:var(--ac);cursor:pointer;font-size:10px;font-family:'JetBrains Mono',monospace;flex-shrink:0;margin-left:6px;">✓ Чекліст</button>
+    </div>
+
     <!-- My status -->
     <div class="card">
-      <div class="clabel">Мій статус</div>
+      <div class="cl">Мій статус</div>
       <div class="sg">
         <button class="sb sf"  data-s="free"   onclick="setS('free')">  <span class="em">🟢</span><span class="lb">Вільний</span></button>
         <button class="sb se"  data-s="ending" onclick="setS('ending')"><span class="em">⚡</span><span class="lb">Закінчую</span></button>
@@ -166,33 +232,71 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
 
     <!-- Chat -->
     <div class="card">
-      <div class="clabel">💬 Чат з медсестрою</div>
+      <div class="cl">💬 Чат з медсестрою</div>
       <div class="msgs" id="msgs"><div class="empty">Завантаження...</div></div>
       <div class="cq">
         <span class="qp" onclick="qs('Наступний!')">Наступний!</span>
         <span class="qp" onclick="qs('Зачекайте 5 хв')">Зачекайте 5 хв</span>
-        <span class="qp" onclick="qs('Запишіть на завтра')">На завтра</span>
+        <span class="qp" onclick="qs('На завтра')">На завтра</span>
         <span class="qp" onclick="qs('☕ Кавус')">☕</span>
         <span class="qp" onclick="qs('Добре 👍')">👍</span>
       </div>
       <div class="crow">
-        <input class="cin" id="cin" placeholder="Написати медсестрі..." onkeydown="if(event.key==='Enter')cs()">
-        <button class="csb" onclick="cs()">↑</button>
+        <input class="cin" id="cin" placeholder="Написати медсестрі..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="csb" onclick="sendChat()">↑</button>
       </div>
     </div>
 
-    <!-- Schedule full width -->
-    <div class="card card-sched">
-      <div class="clabel">📅 Розклад сьогодні</div>
+    <!-- Finance -->
+    <div class="card">
+      <div class="cl">💰 Фінанси сьогодні</div>
+      <div class="fin-body">
+        <div class="fin-row">
+          <div class="fin-box real"><div class="fin-lbl">Готівка</div><div class="fin-val" id="finReal">0 ₴</div></div>
+          <div class="fin-box official"><div class="fin-lbl">Офіційно</div><div class="fin-val" id="finOff">0 ₴</div></div>
+        </div>
+        <div class="fin-row">
+          <div class="fin-box" style="border-color:rgba(187,136,255,.3)"><div class="fin-lbl">Разом</div><div class="fin-val" style="color:var(--pu)" id="finTotal">0 ₴</div></div>
+          <div class="fin-box" style="border-color:rgba(255,136,0,.3)"><div class="fin-lbl">Пацієнтів</div><div class="fin-val" style="color:var(--or)" id="finCount">0</div></div>
+        </div>
+        <div class="fin-btns" id="finBtns">
+          <span class="fb" onclick="addFin(550,true)">Консульт 550</span>
+          <span class="fb" onclick="addFin(1100,true)">Прийом 1100</span>
+          <span class="fb" onclick="addFin(2750,false)">Пакет 2750</span>
+          <span class="fb" onclick="addFin(5040,false)">Пакет 5040</span>
+        </div>
+        <div class="fin-manual">
+          <input class="fin-input" id="finAmt" type="number" placeholder="Сума ₴">
+          <select class="fin-input" id="finType" style="max-width:90px">
+            <option value="real">Готівка</option>
+            <option value="official">Офіційно</option>
+          </select>
+          <button class="fin-add" onclick="addFinManual()">+ Додати</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule -->
+    <div class="card">
+      <div class="cl">📅 Розклад сьогодні</div>
       <div class="sl-list" id="sl"><div class="empty">Завантаження...</div></div>
     </div>
 
   </div>
 </div>
 
+<!-- Checklist modal -->
+<div class="modal" id="chkModal">
+  <div class="modal-box">
+    <div class="modal-title">✓ Чекліст прийому</div>
+    <div id="chkList"></div>
+    <button class="modal-close" onclick="closeChecklist()">Закрити</button>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, set, onValue, push }
+import { getDatabase, ref, set, onValue, push, get }
   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
 const db = getDatabase(initializeApp({
@@ -202,21 +306,32 @@ const db = getDatabase(initializeApp({
   appId:"1:727432965889:web:33825368d0ef0dbb03f500"
 }));
 
-const rD=ref(db,'status/doctor'), rN=ref(db,'status/nurse'),
-      rC=ref(db,'chat'), rS=ref(db,'schedule/today');
+const rD=ref(db,'status/doctor'),rN=ref(db,'status/nurse'),
+      rC=ref(db,'chat'),rS=ref(db,'schedule/today'),
+      rF=ref(db,'finance/today');
 
+// ── Configs ────────────────────────────────────
 const nCfg={
-  none:   {i:'👤',t:'Пацієнтів немає',   s:'Реєстратура вільна',      c:'ns-none'},
-  arrived:{i:'🔔',t:'Прийшов пацієнт',   s:'Готує до прийому',        c:'ns-arrived'},
-  nervous:{i:'😤',t:'Нервує!',            s:'⚠️ Потрібна ваша увага!', c:'ns-nervous'},
-  gone:   {i:'✅',t:'Пішов',             s:'Пацієнт вийшов',          c:'ns-gone'},
+  none:   {i:'👤',t:'Немає пацієнтів', s:'Реєстратура вільна',      c:'ns-none'},
+  arrived:{i:'🔔',t:'Прийшов пацієнт', s:'Готує до прийому',        c:'ns-arrived'},
+  nervous:{i:'😤',t:'Нервує!',          s:'⚠️ Потрібна ваша увага!', c:'ns-nervous'},
+  gone:   {i:'✅',t:'Пішов',           s:'Пацієнт вийшов',          c:'ns-gone'},
 };
 const dCfg={free:{e:'🟢',l:'Вільний'},ending:{e:'⚡',l:'Закінчую'},busy:{e:'🔴',l:'Зайнятий'},wait:{e:'⏳',l:'Зачекайте'},break:{e:'☕',l:'Перерва'}};
 const tC={primary:'#ff4444',repeat:'#44cc88',derm:'#44aaff',removal:'#ffaa00',massage:'#8866ff',inter:'#ff88aa'};
-const tL={primary:'Первинний',repeat:'Повторний',derm:'Дерматологія',removal:'Видалення',massage:'Масаж',inter:'Проміжний'};
+const tL={primary:'Первинний',repeat:'Повторний',derm:'Дерматологія',removal:'Видалення',massage:'Масаж простати',inter:'Проміжний аналіз'};
+const stE={waiting:'⏰',arrived:'🔔',inroom:'🩺',done:'✅',missed:'❌'};
 
+const CHECKLIST = [
+  'Скарги зібрані','Анамнез записаний','Огляд проведено',
+  'Аналізи призначені','Лікування призначено','Рекомендації дані',
+  'Повторний прийом запропонований','Оплата прийнята'
+];
+
+// ── Nurse ──────────────────────────────────────
 onValue(rN,snap=>{
-  const d=snap.val()||{status:'none'}, c=nCfg[d.status]||nCfg.none, nd=document.getElementById('nd');
+  const d=snap.val()||{status:'none'},c=nCfg[d.status]||nCfg.none;
+  const nd=document.getElementById('nd');
   nd.className='ndisp '+c.c;
   document.getElementById('ni').textContent=c.i;
   document.getElementById('ntx').textContent=c.t;
@@ -225,69 +340,194 @@ onValue(rN,snap=>{
     new Date(d.timestamp).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
 });
 
+// ── Chat ───────────────────────────────────────
+// KEY FIX: use onValue for reading, push for writing
 onValue(rC,snap=>{
   const msgs=[];
   snap.forEach(c=>msgs.push({id:c.key,...c.val()}));
+  renderChat(msgs);
+});
+
+function renderChat(msgs){
   const box=document.getElementById('msgs');
-  box.innerHTML='';
   if(!msgs.length){box.innerHTML='<div class="empty">Чат порожній</div>';return;}
+  // Only re-render if count changed
+  box.innerHTML='';
   msgs.slice(-40).forEach(m=>{
-    const me=m.sender==='doctor', el=document.createElement('div');
+    const me=m.sender==='doctor',el=document.createElement('div');
     el.className='msg '+(me?'me':'her');
     const t=m.timestamp?new Date(m.timestamp).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'}):'';
     el.innerHTML=`<div class="bbl">${esc(m.text)}</div><div class="mm">${me?'Лікар':'Медсестра'} · ${t}</div>`;
     box.appendChild(el);
   });
   box.scrollTop=box.scrollHeight;
-});
+}
 
+// ── Schedule ───────────────────────────────────
+let allAppts=[];
 onValue(rS,snap=>{
-  const d=snap.val(), list=document.getElementById('sl');
+  const d=snap.val();
+  const list=document.getElementById('sl');
   list.innerHTML='';
   if(!d){
-    list.innerHTML='<div class="empty">Запустіть syncCalendarToFirebase в Apps Script</div>';
-    ['sT','sD','sL'].forEach(id=>document.getElementById(id).textContent='0');
-    document.getElementById('sN').textContent='—';
-    return;
+    list.innerHTML='<div class="empty">Розклад порожній.<br>Запустіть syncCalendarToFirebase</div>';
+    updateStats([]);allAppts=[];updateNextPatient();return;
   }
-  const appts=Object.entries(d).map(([id,v])=>({id,...v})).sort((a,b)=>a.time.localeCompare(b.time));
+  allAppts=Object.entries(d).map(([id,v])=>({id,...v})).sort((a,b)=>a.time.localeCompare(b.time));
   const now=new Date().toTimeString().slice(0,5);
-  let done=0,left=0,nxt=null;
-  appts.forEach(a=>{
+  allAppts.forEach(a=>{
     const cur=a.status!=='done'&&a.status!=='missed'&&Math.abs(tm(a.time)-tm(now))<25;
-    if(a.status==='done') done++; else{left++;if(!nxt)nxt=a.time;}
     const el=document.createElement('div');
     el.className='appt'+(cur?' current':'')+(a.status==='done'?' done':'')+(a.status==='missed'?' missed':'');
-    const em={waiting:'⏰',arrived:'🔔',inroom:'🩺',done:'✅',missed:'❌'}[a.status||'waiting']||'⏰';
-    el.innerHTML=`<div class="adot" style="background:${tC[a.type]||'#888'}"></div><div class="atm">${a.time}</div><div class="acd">${esc(a.code||a.name||'—')}</div><div class="atp">${tL[a.type]||''}</div><div class="ast" onclick="cyc('${a.id}','${a.status||'waiting'}')">${em}</div>`;
+    el.innerHTML=`<div class="adot" style="background:${tC[a.type]||'#888'}"></div><div class="atm">${a.time}</div><div class="acd">${esc(a.code||a.name||'—')}</div><div class="atp">${tL[a.type]||''}</div><div class="ast" onclick="cyc('${a.id}','${a.status||'waiting'}')">${stE[a.status||'waiting']||'⏰'}</div>`;
     list.appendChild(el);
   });
+  updateStats(allAppts);
+  updateNextPatient();
+});
+
+function updateStats(appts){
+  const done=appts.filter(a=>a.status==='done').length;
+  const left=appts.filter(a=>a.status!=='done'&&a.status!=='missed').length;
   document.getElementById('sT').textContent=appts.length;
   document.getElementById('sD').textContent=done;
   document.getElementById('sL').textContent=left;
-  document.getElementById('sN').textContent=nxt||'—';
+}
+
+function updateNextPatient(){
+  const now=new Date().toTimeString().slice(0,5);
+  const next=allAppts.find(a=>a.time>now&&a.status!=='done'&&a.status!=='missed');
+  document.getElementById('sN').textContent=next?next.time:'—';
+  if(!next){
+    document.getElementById('nextTime').textContent='—';
+    document.getElementById('nextCode').textContent='Більше записів немає';
+    document.getElementById('nextType').textContent='';
+    document.getElementById('nextCountdown').textContent='';
+    return;
+  }
+  document.getElementById('nextTime').textContent=next.time;
+  document.getElementById('nextCode').textContent=next.code||next.name||'—';
+  document.getElementById('nextType').textContent=tL[next.type]||next.type||'';
+  // Countdown
+  const diff=tm(next.time)-tm(now);
+  document.getElementById('nextCountdown').textContent=diff>0?`через ${diff} хв`:'Зараз';
+}
+
+// Update countdown every minute
+setInterval(updateNextPatient,60000);
+
+// ── Finance ────────────────────────────────────
+let finData={real:0,official:0,count:0};
+onValue(rF,snap=>{
+  finData=snap.val()||{real:0,official:0,count:0};
+  renderFin();
 });
 
+function renderFin(){
+  const fmt=n=>(n||0).toLocaleString('uk-UA')+'₴';
+  document.getElementById('finReal').textContent=fmt(finData.real);
+  document.getElementById('finOff').textContent=fmt(finData.official);
+  document.getElementById('finTotal').textContent=fmt((finData.real||0)+(finData.official||0));
+  document.getElementById('finCount').textContent=finData.count||0;
+  document.getElementById('sFin').textContent=Math.round((finData.real||0)/1000)+'k';
+  document.getElementById('sOff').textContent=Math.round((finData.official||0)/1000)+'k';
+}
+
+window.addFin=(amt,isOfficial)=>{
+  const key=isOfficial?'official':'real';
+  set(rF,{
+    real:(finData.real||0)+(isOfficial?0:amt),
+    official:(finData.official||0)+(isOfficial?amt:0),
+    count:(finData.count||0)+1
+  });
+};
+
+window.addFinManual=()=>{
+  const amt=parseInt(document.getElementById('finAmt').value);
+  const type=document.getElementById('finType').value;
+  if(!amt||amt<=0)return;
+  document.getElementById('finAmt').value='';
+  window.addFin(amt,type==='official');
+};
+
+// ── Doctor status ──────────────────────────────
 window.setS=s=>{
   document.querySelectorAll('.sb').forEach(b=>b.classList.toggle('active',b.dataset.s===s));
   set(rD,{status:s,emoji:dCfg[s]?.e||'',label:dCfg[s]?.l||s,timestamp:Date.now()});
 };
 setS('free');
 
-window.cs=()=>{
-  const i=document.getElementById('cin'), t=i.value.trim();
-  if(!t)return; i.value='';
-  push(rC,{sender:'doctor',text:t,timestamp:Date.now()});
+// ── Send chat ──────────────────────────────────
+window.sendChat=()=>{
+  const inp=document.getElementById('cin');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  inp.value='';
+  // Use push with rC ref — KEY FIX
+  push(rC,{sender:'doctor',text:txt,timestamp:Date.now()})
+    .catch(e=>console.error('Chat push error:',e));
 };
-window.qs=t=>{document.getElementById('cin').value=t;window.cs();};
+window.qs=t=>{document.getElementById('cin').value=t;window.sendChat();};
+
+// ── Cycle appt status ──────────────────────────
 window.cyc=(id,cur)=>{
   const o=['waiting','arrived','inroom','done','missed'];
   set(ref(db,`schedule/today/${id}/status`),o[(o.indexOf(cur)+1)%o.length]);
 };
 
-const tick=()=>{document.getElementById('clk').textContent=' · '+new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});};
+// ── Timer ──────────────────────────────────────
+let timerSec=0,timerRunning=false,timerInterval=null;
+const APPT_LIMIT=30*60; // 30 min default
+
+window.toggleTimer=()=>{
+  if(!timerRunning){
+    timerSec=0;timerRunning=true;
+    timerInterval=setInterval(()=>{
+      timerSec++;
+      const m=Math.floor(timerSec/60).toString().padStart(2,'0');
+      const s=(timerSec%60).toString().padStart(2,'0');
+      const badge=document.getElementById('timerBadge');
+      badge.textContent=`⏱ ${m}:${s}`;
+      if(timerSec>APPT_LIMIT) badge.className='timer-badge over';
+      else badge.className='timer-badge running';
+    },1000);
+  } else {
+    clearInterval(timerInterval);timerRunning=false;timerSec=0;
+    const badge=document.getElementById('timerBadge');
+    badge.textContent='⏱ 00:00';badge.className='timer-badge idle';
+  }
+};
+
+// ── Checklist ──────────────────────────────────
+let chkState=Array(CHECKLIST.length).fill(false);
+
+window.openChecklist=()=>{
+  chkState=Array(CHECKLIST.length).fill(false);
+  renderChecklist();
+  document.getElementById('chkModal').classList.add('open');
+};
+window.closeChecklist=()=>document.getElementById('chkModal').classList.remove('open');
+
+function renderChecklist(){
+  const list=document.getElementById('chkList');
+  list.innerHTML='';
+  CHECKLIST.forEach((txt,i)=>{
+    const el=document.createElement('div');
+    el.className='chk-item'+(chkState[i]?' checked':'');
+    el.innerHTML=`<div class="chk-box"></div><div class="chk-txt">${txt}</div>`;
+    el.onclick=()=>{chkState[i]=!chkState[i];renderChecklist();};
+    list.appendChild(el);
+  });
+}
+
+// ── Clock ──────────────────────────────────────
+const tick=()=>{
+  document.getElementById('clk').textContent=' · '+
+    new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+};
 tick();setInterval(tick,1000);
 
+// ── Helpers ────────────────────────────────────
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function tm(t){const[h,m]=(t||'0:0').split(':').map(Number);return h*60+m;}
 </script>

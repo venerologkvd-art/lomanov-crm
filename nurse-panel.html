@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Панель Медсестри — Dr. Lomanov</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Unbounded:wght@300;400;700;900&display=swap');
+
+  :root {
+    --bg: #060b10;
+    --surface: #0d1520;
+    --surface2: #162030;
+    --border: #1e3050;
+    --text: #c8e0ff;
+    --muted: #3a5070;
+    --green: #00ff88;
+    --red: #ff3355;
+    --yellow: #ffcc00;
+    --orange: #ff8800;
+    --purple: #bb88ff;
+    --blue: #0088ff;
+    --radius: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* ─── DOCTOR STATUS — ГОЛОВНИЙ ЕКРАН ─────────────────────────── */
+  .doctor-status-area {
+    padding: 16px 16px 0;
+    flex-shrink: 0;
+  }
+
+  .ds-label {
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--green);
+    font-size: 10px;
+  }
+
+  .live-badge::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 1.4s ease infinite;
+  }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
+    50% { opacity: 0.5; transform: scale(0.85); box-shadow: 0 0 0 6px rgba(0,255,136,0); }
+  }
+
+  .doctor-card {
+    border-radius: var(--radius);
+    border: 2px solid;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 100px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Glow background effect */
+  .doctor-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.12;
+    transition: opacity 0.3s;
+  }
+
+  .dc-free { border-color: var(--green); }
+  .dc-free::before { background: radial-gradient(circle at 30% 50%, var(--green), transparent 60%); }
+
+  .dc-ending { border-color: var(--yellow); }
+  .dc-ending::before { background: radial-gradient(circle at 30% 50%, var(--yellow), transparent 60%); }
+
+  .dc-busy { border-color: var(--red); animation: flash-border 1.5s ease infinite; }
+  .dc-busy::before { background: radial-gradient(circle at 30% 50%, var(--red), transparent 60%); }
+
+  @keyframes flash-border {
+    0%,100% { border-color: var(--red); box-shadow: 0 0 20px rgba(255,51,85,0.2); }
+    50% { border-color: rgba(255,51,85,0.5); box-shadow: 0 0 40px rgba(255,51,85,0.4); }
+  }
+
+  .dc-wait { border-color: var(--orange); }
+  .dc-wait::before { background: radial-gradient(circle at 30% 50%, var(--orange), transparent 60%); }
+
+  .dc-break { border-color: var(--purple); }
+  .dc-break::before { background: radial-gradient(circle at 30% 50%, var(--purple), transparent 60%); }
+
+  .dc-emoji {
+    font-size: 48px;
+    line-height: 1;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .dc-info { flex: 1; position: relative; z-index: 1; }
+
+  .dc-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .dc-status {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+
+  .dc-time {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  /* ─── КНОПКИ МЕДСЕСТРИ ──────────────────────────────────────────── */
+  .nurse-actions {
+    padding: 12px 16px;
+    flex-shrink: 0;
+  }
+
+  .na-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .nurse-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .nurse-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 16px;
+    border-radius: 12px;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text);
+    text-align: left;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  .nurse-btn:active { transform: scale(0.96); }
+
+  .nurse-btn.active {
+    border-width: 2px;
+    box-shadow: 0 0 24px currentColor;
+    transform: scale(1.02);
+  }
+
+  .nurse-btn .nb-emoji { font-size: 28px; flex-shrink: 0; }
+  .nurse-btn .nb-text { font-size: 12px; font-weight: 600; letter-spacing: 0.02em; line-height: 1.3; }
+  .nurse-btn .nb-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+  .nb-none { color: var(--muted); }
+  .nb-arrived { color: var(--yellow); border-color: rgba(255,204,0,0.3); }
+  .nb-arrived.active { border-color: var(--yellow); background: rgba(255,204,0,0.08); }
+  .nb-nervous { color: var(--red); border-color: rgba(255,51,85,0.3); }
+  .nb-nervous.active { border-color: var(--red); background: rgba(255,51,85,0.1); animation: flash-bg 1s ease infinite; }
+  .nb-gone { color: var(--green); border-color: rgba(0,255,136,0.3); }
+  .nb-gone.active { border-color: var(--green); background: rgba(0,255,136,0.08); }
+  .nb-none.active { border-color: var(--muted); background: rgba(74,96,128,0.15); }
+
+  @keyframes flash-bg {
+    0%,100% { background: rgba(255,51,85,0.1); }
+    50% { background: rgba(255,51,85,0.2); }
+  }
+
+  /* ─── ЧАТ ─────────────────────────────────────────────────────── */
+  .chat-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .chat-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+
+  .chat-msgs {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-right: 2px;
+    min-height: 80px;
+    max-height: 200px;
+  }
+
+  .chat-msgs::-webkit-scrollbar { width: 3px; }
+  .chat-msgs::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .msg {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-width: 82%;
+  }
+
+  .msg.from-me { align-self: flex-end; align-items: flex-end; }
+  .msg.from-doctor { align-self: flex-start; align-items: flex-start; }
+
+  .msg-bubble {
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .from-me .msg-bubble {
+    background: linear-gradient(135deg, #005588, #0099cc);
+    color: #fff;
+    border-bottom-right-radius: 3px;
+  }
+
+  .from-doctor .msg-bubble {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-bottom-left-radius: 3px;
+    color: var(--text);
+  }
+
+  .msg-meta { font-size: 10px; color: var(--muted); padding: 0 4px; }
+
+  .chat-quick {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  .chat-quick::-webkit-scrollbar { display: none; }
+
+  .q-pill {
+    flex-shrink: 0;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    font-size: 12px;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.2s;
+    background: var(--surface2);
+    white-space: nowrap;
+  }
+
+  .q-pill:active { background: rgba(0,136,255,0.2); color: var(--text); }
+
+  .chat-input-row {
+    display: flex;
+    gap: 8px;
+    padding: 10px 16px 16px;
+    flex-shrink: 0;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+  }
+
+  .chat-in {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 14px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .chat-in:focus { border-color: #0088ff; }
+  .chat-in::placeholder { color: var(--muted); }
+
+  .chat-send-btn {
+    background: linear-gradient(135deg, #005588, #0099cc);
+    border: none;
+    border-radius: 10px;
+    padding: 12px 18px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  /* ─── РОЗКЛАД ─────────────────────────────────────────────────── */
+  .sched-section {
+    padding: 0 16px 8px;
+    max-height: 200px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sched-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    flex-shrink: 0;
+  }
+
+  .sched-list {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .sched-list::-webkit-scrollbar { width: 3px; }
+  .sched-list::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .sched-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 12px;
+  }
+
+  .sched-item.current { border-color: #0088ff; background: rgba(0,136,255,0.08); }
+  .sched-item.done { opacity: 0.35; }
+
+  .sched-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .sched-time { color: var(--muted); width: 42px; flex-shrink: 0; }
+  .sched-code { flex: 1; font-weight: 600; }
+  .sched-type { font-size: 10px; color: var(--muted); }
+  .sched-stat { font-size: 14px; }
+
+  /* Connection badge */
+  .conn-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 8px 16px;
+    flex-shrink: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .conn-badge.connected { color: var(--green); }
+  .conn-badge.disconnected { color: var(--red); }
+
+  .conn-badge::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  /* Clock */
+  .clock {
+    font-family: 'Unbounded', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 0.05em;
+  }
+
+  .date-str {
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    margin-top: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Top bar with clock */
+  .top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px 8px;
+    flex-shrink: 0;
+  }
+
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 16px;
+    flex-shrink: 0;
+  }
+
+  /* Loading */
+  .loading-sm {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+    font-size: 11px;
+    padding: 12px;
+  }
+
+  .spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border);
+    border-top-color: var(--blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- Top bar: clock -->
+<div class="top-bar">
+  <div>
+    <div class="clock" id="clock">00:00</div>
+    <div class="date-str" id="dateStr">—</div>
+  </div>
+  <div style="text-align:right">
+    <div style="font-family:'Unbounded';font-size:10px;font-weight:300;letter-spacing:0.25em;color:var(--muted);text-transform:uppercase">Медсестра</div>
+    <div style="font-size:10px;color:var(--muted);letter-spacing:0.1em;margin-top:2px">Dr. Lomanov CRM</div>
+  </div>
+</div>
+
+<!-- Лікар статус -->
+<div class="doctor-status-area">
+  <div class="ds-label">
+    <span>Статус лікаря</span>
+    <span class="live-badge">REAL-TIME</span>
+  </div>
+  <div class="doctor-card dc-free" id="doctorCard">
+    <div class="dc-emoji" id="doctorEmoji">🟢</div>
+    <div class="dc-info">
+      <div class="dc-label">Доктор Ломанов</div>
+      <div class="dc-status" id="doctorStatus">Вільний</div>
+      <div class="dc-time" id="doctorTime">Очікування оновлення...</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Кнопки медсестри -->
+<div class="nurse-actions">
+  <div class="na-label">Мій статус реєстратури</div>
+  <div class="nurse-btns">
+    <button class="nurse-btn nb-none active" data-ns="none" onclick="setNurseStatus('none')">
+      <span class="nb-emoji">👤</span>
+      <div>
+        <div class="nb-text">Пацієнтів немає</div>
+        <div class="nb-sub">Реєстратура вільна</div>
+      </div>
+    </button>
+    <button class="nurse-btn nb-arrived" data-ns="arrived" onclick="setNurseStatus('arrived')">
+      <span class="nb-emoji">🔔</span>
+      <div>
+        <div class="nb-text">Прийшов пацієнт</div>
+        <div class="nb-sub">Готує до прийому</div>
+      </div>
+    </button>
+    <button class="nurse-btn nb-nervous" data-ns="nervous" onclick="setNurseStatus('nervous')">
+      <span class="nb-emoji">😤</span>
+      <div>
+        <div class="nb-text">Нервує!</div>
+        <div class="nb-sub">⚠️ Потрібна допомога</div>
+      </div>
+    </button>
+    <button class="nurse-btn nb-gone" data-ns="gone" onclick="setNurseStatus('gone')">
+      <span class="nb-emoji">✅</span>
+      <div>
+        <div class="nb-text">Пішов</div>
+        <div class="nb-sub">Пацієнт вийшов</div>
+      </div>
+    </button>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Розклад -->
+<div class="sched-section">
+  <div class="sched-label">📅 Розклад сьогодні</div>
+  <div class="sched-list" id="schedList">
+    <div class="loading-sm"><div class="spinner"></div>Завантаження...</div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<!-- Чат -->
+<div class="chat-section">
+  <div class="chat-label">💬 Чат з лікарем</div>
+  <div class="chat-msgs" id="chatMsgs">
+    <div class="loading-sm"><div class="spinner"></div>Завантаження...</div>
+  </div>
+  <div class="chat-quick" id="quickPills">
+    <span class="q-pill" onclick="sendQ('Пацієнт готовий')">Пацієнт готовий</span>
+    <span class="q-pill" onclick="sendQ('Зрозуміло 👍')">Зрозуміло 👍</span>
+    <span class="q-pill" onclick="sendQ('Дзвонять — не беруть трубку')">Не беруть трубку</span>
+    <span class="q-pill" onclick="sendQ('Прибрала кабінет ✅')">Прибрала ✅</span>
+    <span class="q-pill" onclick="sendQ('Інструмент готовий')">Інструмент готовий</span>
+  </div>
+</div>
+
+<!-- Chat input -->
+<div class="chat-input-row">
+  <input class="chat-in" id="chatIn" placeholder="Написати лікарю..." onkeydown="if(event.key==='Enter')sendMsg()">
+  <button class="chat-send-btn" onclick="sendMsg()">↑</button>
+</div>
+
+<!-- Connection -->
+<div class="conn-badge disconnected" id="connBadge">З'єднання...</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getDatabase, ref, set, onValue, push }
+    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAg_Cu6fZeviw3EooBd3WB_BzI1PiceshA",
+    databaseURL: "https://lomanov-crm-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "lomanov-crm",
+    appId: "1:727432965889:web:33825368d0ef0dbb03f500"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  const doctorStatusRef = ref(db, 'status/doctor');
+  const nurseStatusRef  = ref(db, 'status/nurse');
+  const chatRef         = ref(db, 'chat');
+  const scheduleRef     = ref(db, 'schedule/today');
+  const connRef         = ref(db, '.info/connected');
+
+  // Doctor status config
+  const doctorCfg = {
+    free:   { emoji:'🟢', label:'Вільний',   cls:'dc-free',   color:'var(--green)' },
+    ending: { emoji:'⚡', label:'Закінчую',  cls:'dc-ending', color:'var(--yellow)' },
+    busy:   { emoji:'🔴', label:'Зайнятий',  cls:'dc-busy',   color:'var(--red)' },
+    wait:   { emoji:'⏳', label:'Зачекайте', cls:'dc-wait',   color:'var(--orange)' },
+    break:  { emoji:'☕', label:'Перерва',   cls:'dc-break',  color:'var(--purple)' },
+  };
+
+  const typeColors = {
+    primary:'#ff4444', repeat:'#44cc88', derm:'#44aaff',
+    removal:'#ffaa00', massage:'#8866ff', inter:'#ff88aa'
+  };
+  const typeLabels = {
+    primary:'Первинний', repeat:'Повторний', derm:'Дерматологія',
+    removal:'Видалення', massage:'Масаж', inter:'Проміжний'
+  };
+
+  // ── Connection ────────────────────────────────────────────────────
+  onValue(connRef, snap => {
+    const online = snap.val();
+    const el = document.getElementById('connBadge');
+    el.textContent = online ? 'Firebase підключено — real-time активний' : 'Офлайн';
+    el.className = 'conn-badge ' + (online ? 'connected' : 'disconnected');
+  });
+
+  // ── Doctor status listener ────────────────────────────────────────
+  onValue(doctorStatusRef, snap => {
+    const data = snap.val();
+    if (!data) return;
+
+    const cfg = doctorCfg[data.status] || doctorCfg.free;
+    const card = document.getElementById('doctorCard');
+
+    card.className = 'doctor-card ' + cfg.cls;
+    document.getElementById('doctorEmoji').textContent  = cfg.emoji;
+    document.getElementById('doctorStatus').textContent = cfg.label;
+    document.getElementById('doctorStatus').style.color = cfg.color;
+
+    if (data.timestamp) {
+      const d = new Date(data.timestamp);
+      document.getElementById('doctorTime').textContent =
+        'Оновлено о ' + d.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+    }
+  });
+
+  // ── Chat listener ─────────────────────────────────────────────────
+  onValue(chatRef, snap => {
+    const msgs = [];
+    snap.forEach(c => msgs.push({ id: c.key, ...c.val() }));
+    renderChat(msgs);
+  });
+
+  function renderChat(msgs) {
+    const c = document.getElementById('chatMsgs');
+    c.innerHTML = '';
+
+    if (!msgs.length) {
+      c.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:11px;padding:16px">Чат порожній</div>';
+      return;
+    }
+
+    msgs.slice(-25).forEach(msg => {
+      const fromMe = msg.sender === 'nurse';
+      const el = document.createElement('div');
+      el.className = 'msg ' + (fromMe ? 'from-me' : 'from-doctor');
+
+      const time = msg.timestamp
+        ? new Date(msg.timestamp).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})
+        : '';
+
+      el.innerHTML = `
+        <div class="msg-bubble">${escHtml(msg.text)}</div>
+        <div class="msg-meta">${fromMe?'Ви':'Лікар'} · ${time}</div>
+      `;
+      c.appendChild(el);
+    });
+
+    c.scrollTop = c.scrollHeight;
+  }
+
+  // ── Schedule listener ─────────────────────────────────────────────
+  onValue(scheduleRef, snap => {
+    const data = snap.val();
+    const list = document.getElementById('schedList');
+
+    if (!data) {
+      list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:11px;padding:12px">Розклад порожній</div>';
+      return;
+    }
+
+    const appts = Object.entries(data).map(([id, v]) => ({id,...v}))
+      .sort((a,b) => a.time.localeCompare(b.time));
+
+    const now = new Date().toTimeString().slice(0,5);
+    list.innerHTML = '';
+
+    appts.forEach(appt => {
+      const isCurrent = Math.abs(timeToMins(appt.time) - timeToMins(now)) < 25 && appt.status !== 'done';
+      const el = document.createElement('div');
+      el.className = 'sched-item' + (isCurrent?' current':'') + (appt.status==='done'?' done':'');
+
+      const color = typeColors[appt.type] || '#888';
+      const statusEmoji = {
+        waiting:'⏰', arrived:'🔔', inroom:'🩺', done:'✅', missed:'❌'
+      }[appt.status||'waiting'] || '⏰';
+
+      el.innerHTML = `
+        <div class="sched-dot" style="background:${color}"></div>
+        <div class="sched-time">${appt.time}</div>
+        <div class="sched-code">${escHtml(appt.code||appt.name||'—')}</div>
+        <div class="sched-stat">${statusEmoji}</div>
+      `;
+      list.appendChild(el);
+    });
+  });
+
+  // ── Set nurse status ──────────────────────────────────────────────
+  window.setNurseStatus = async (status) => {
+    document.querySelectorAll('.nurse-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.ns === status);
+    });
+
+    await set(nurseStatusRef, {
+      status,
+      timestamp: Date.now(),
+    });
+  };
+
+  // ── Send chat ─────────────────────────────────────────────────────
+  window.sendMsg = async () => {
+    const input = document.getElementById('chatIn');
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+
+    await push(chatRef, {
+      sender: 'nurse',
+      text,
+      timestamp: Date.now(),
+    });
+  };
+
+  window.sendQ = (text) => {
+    document.getElementById('chatIn').value = text;
+    sendMsg();
+  };
+
+  // ── Helpers ───────────────────────────────────────────────────────
+  function escHtml(str) {
+    return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function timeToMins(t) {
+    const [h,m] = (t||'0:0').split(':').map(Number);
+    return h*60+m;
+  }
+
+  // ── Clock ─────────────────────────────────────────────────────────
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      now.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    document.getElementById('dateStr').textContent =
+      now.toLocaleDateString('uk-UA',{weekday:'long',day:'numeric',month:'long'}).toUpperCase();
+  }
+  updateClock();
+  setInterval(updateClock, 1000);
+</script>
+</body>
+</html>

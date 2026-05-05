@@ -3,7 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Лікар — Dr. Lomanov CRM v3</title>
+<title>Лікар — Dr. Lomanov</title>
+
+<!-- Firebase compat (не модуль — глобальний firebase об'єкт) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Unbounded:wght@300;400;700&display=swap');
 :root{
@@ -12,10 +17,9 @@
   --gr:#00ff88;--rd:#ff3355;--yl:#ffcc00;--or:#ff8800;--pu:#bb88ff;
   --tx:#ddeeff;--mt:#3a5575;--r:9px;
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+*{margin:0;padding:0;box-sizing:border-box;}
 html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrains Mono',monospace;}
 
-/* ── DESKTOP: fixed 100vh, no body scroll ── */
 @media(min-width:681px){
   body{overflow:hidden;}
   .app{height:100vh;display:flex;flex-direction:column;}
@@ -24,8 +28,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
   .msgs{flex:1;overflow-y:auto;min-height:0;}
   .sl-list{flex:1;overflow-y:auto;min-height:0;}
 }
-
-/* ── MOBILE ── */
 @media(max-width:680px){
   body{overflow-y:auto;}
   .app{min-height:100vh;}
@@ -35,7 +37,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
   .sl-list{max-height:240px;overflow-y:auto;}
 }
 
-/* Topbar */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:0 12px;height:40px;border-bottom:1px solid var(--bd);background:var(--s1);flex-shrink:0;}
 .logo{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;color:var(--ac);letter-spacing:.18em;}
 .clk{font-size:11px;color:var(--mt);margin-left:10px;}
@@ -43,18 +44,15 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
 .live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gr);animation:bl 1.4s ease infinite;}
 @keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* Stats */
 .stats{display:grid;grid-template-columns:repeat(6,1fr);height:32px;border-bottom:1px solid var(--bd);background:var(--s1);flex-shrink:0;}
 .st{display:flex;flex-direction:column;align-items:center;justify-content:center;border-right:1px solid var(--bd);}
 .st:last-child{border-right:none;}
 .sv{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;color:var(--ac);line-height:1;}
 .sl{font-size:8px;color:var(--mt);letter-spacing:.08em;text-transform:uppercase;}
 
-/* Card base */
 .card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);}
 .cl{font-size:8px;letter-spacing:.3em;color:var(--mt);text-transform:uppercase;padding:5px 10px 4px;border-bottom:1px solid var(--bd);flex-shrink:0;}
 
-/* ── ROW 1: Nurse + Next patient ── */
 .card-nurse{grid-column:1;flex-direction:row;align-items:stretch;}
 .nlbl{font-size:8px;letter-spacing:.2em;color:var(--mt);text-transform:uppercase;padding:0 10px;width:110px;flex-shrink:0;border-right:1px solid var(--bd);display:flex;align-items:center;}
 .ndisp{flex:1;display:flex;align-items:center;gap:10px;padding:0 12px;transition:background .4s;}
@@ -68,34 +66,30 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
 .ns-gone{background:rgba(0,255,136,.07);border-color:var(--gr)!important;}
 @keyframes nf{0%,100%{background:rgba(255,51,85,.13)}50%{background:rgba(255,51,85,.27)}}
 
-/* Next patient card */
 .card-next{grid-column:2;flex-direction:row;align-items:center;gap:12px;padding:0 14px;}
 .next-time{font-family:'Unbounded',sans-serif;font-size:22px;font-weight:700;color:var(--ac);flex-shrink:0;min-width:60px;}
 .next-div{width:1px;height:34px;background:var(--bd);flex-shrink:0;}
 .next-info{flex:1;min-width:0;}
 .next-code{font-size:13px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.next-type{font-size:9px;color:var(--mt);margin-top:2px;letter-spacing:.05em;}
-.next-countdown{font-size:9px;color:var(--or);margin-left:auto;flex-shrink:0;text-align:right;}
+.next-type{font-size:9px;color:var(--mt);margin-top:2px;}
+.next-cd{font-size:9px;color:var(--or);margin-left:auto;flex-shrink:0;text-align:right;}
 
-/* Timer badge */
-.timer-badge{display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.timer-badge{display:flex;align-items:center;gap:5px;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0;}
 .timer-badge.idle{background:var(--s2);border:1px solid var(--bd);color:var(--mt);}
 .timer-badge.running{background:rgba(0,255,136,.12);border:1px solid var(--gr);color:var(--gr);}
 .timer-badge.over{background:rgba(255,51,85,.15);border:1px solid var(--rd);color:var(--rd);animation:tb 1s ease infinite;}
 @keyframes tb{0%,100%{opacity:1}50%{opacity:.6}}
 
-/* ── ROW 2: My status + Chat ── */
 .sg{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:6px;flex:1;}
-.sb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px;border-radius:6px;border:1px solid var(--bd);background:var(--s2);cursor:pointer;transition:all .17s;font-family:'JetBrains Mono',monospace;color:var(--tx);font-size:8px;letter-spacing:.03em;text-align:center;user-select:none;}
+.sb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:5px 2px;border-radius:6px;border:1px solid var(--bd);background:var(--s2);cursor:pointer;font-size:8px;text-align:center;transition:all .17s;}
 .sb:hover{border-color:var(--ac2);transform:translateY(-1px);}
 .sb.active{box-shadow:0 0 12px currentColor;transform:scale(1.04);border-color:currentColor;}
 .sb .em{font-size:17px;}.sb .lb{color:var(--mt);}.sb.active .lb{color:inherit;}
 .sf{color:var(--gr);}.se{color:var(--yl);}.sbu{color:var(--rd);}.sw{color:var(--or);}.sbr{color:var(--pu);}
 
-/* Chat */
+.msgs{padding:6px;display:flex;flex-direction:column;gap:4px;}
 .msgs::-webkit-scrollbar{width:3px;}
 .msgs::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
-.msgs{padding:6px;display:flex;flex-direction:column;gap:4px;}
 .msg{display:flex;flex-direction:column;gap:2px;max-width:86%;}
 .msg.me{align-self:flex-end;align-items:flex-end;}
 .msg.her{align-self:flex-start;align-items:flex-start;}
@@ -105,73 +99,62 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
 .mm{font-size:8px;color:var(--mt);padding:0 3px;}
 .cq{display:flex;gap:4px;padding:3px 6px;overflow-x:auto;flex-shrink:0;border-top:1px solid var(--bd);}
 .cq::-webkit-scrollbar{display:none;}
-.qp{flex-shrink:0;padding:2px 8px;border-radius:10px;border:1px solid var(--bd);font-size:10px;cursor:pointer;color:var(--mt);background:var(--s2);white-space:nowrap;font-family:'JetBrains Mono',monospace;transition:all .15s;}
+.qp{flex-shrink:0;padding:2px 8px;border-radius:10px;border:1px solid var(--bd);font-size:10px;cursor:pointer;color:var(--mt);background:var(--s2);white-space:nowrap;font-family:'JetBrains Mono',monospace;}
 .qp:hover{border-color:var(--ac2);color:var(--tx);}
 .crow{display:flex;gap:4px;padding:4px 6px;border-top:1px solid var(--bd);flex-shrink:0;}
-.cin{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:5px 8px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;transition:border-color .2s;}
+.cin{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:5px 8px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;}
 .cin:focus{border-color:var(--ac2);}
 .cin::placeholder{color:var(--mt);}
 .csb{background:linear-gradient(135deg,var(--ac2),var(--ac));border:none;border-radius:6px;padding:5px 10px;color:#fff;cursor:pointer;font-size:13px;flex-shrink:0;}
 
-/* ── ROW 3: Finance + Schedule ── */
-/* Finance */
 .fin-body{flex:1;display:flex;flex-direction:column;gap:4px;padding:6px;overflow:hidden;}
 .fin-row{display:grid;grid-template-columns:1fr 1fr;gap:4px;}
 .fin-box{background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:6px 8px;text-align:center;}
-.fin-box.official{border-color:rgba(0,212,255,.3);}
 .fin-box.real{border-color:rgba(0,255,136,.3);}
+.fin-box.official{border-color:rgba(0,212,255,.3);}
 .fin-lbl{font-size:8px;color:var(--mt);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;}
 .fin-val{font-family:'Unbounded',sans-serif;font-size:16px;font-weight:700;}
-.fin-box.official .fin-val{color:var(--ac);}
 .fin-box.real .fin-val{color:var(--gr);}
+.fin-box.official .fin-val{color:var(--ac);}
 .fin-btns{display:flex;gap:4px;overflow-x:auto;flex-shrink:0;}
 .fin-btns::-webkit-scrollbar{display:none;}
-.fb{flex-shrink:0;padding:4px 10px;border-radius:6px;border:1px solid var(--bd);font-size:10px;cursor:pointer;color:var(--mt);background:var(--s2);white-space:nowrap;font-family:'JetBrains Mono',monospace;transition:all .15s;}
+.fb{flex-shrink:0;padding:4px 10px;border-radius:6px;border:1px solid var(--bd);font-size:10px;cursor:pointer;color:var(--mt);background:var(--s2);white-space:nowrap;font-family:'JetBrains Mono',monospace;}
 .fb:hover{border-color:var(--ac);color:var(--tx);}
 .fin-manual{display:flex;gap:4px;flex-shrink:0;}
 .fin-input{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:4px 8px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;}
-.fin-input:focus{border-color:var(--ac);}
-.fin-input::placeholder{color:var(--mt);}
 .fin-add{background:rgba(0,255,136,.15);border:1px solid rgba(0,255,136,.4);border-radius:6px;padding:4px 10px;color:var(--gr);cursor:pointer;font-size:11px;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
-.fin-add:hover{background:rgba(0,255,136,.25);}
 
-/* Schedule */
 .sl-list{display:flex;flex-direction:column;gap:3px;padding:5px 6px;}
 .sl-list::-webkit-scrollbar{width:3px;}
 .sl-list::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
-.appt{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;border:1px solid var(--bd);background:var(--s2);flex-shrink:0;transition:all .2s;cursor:pointer;}
-.appt:hover{border-color:var(--ac2);}
-.appt.current{border-color:var(--ac);background:rgba(0,212,255,.06);box-shadow:0 0 8px rgba(0,212,255,.12);}
+.appt{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;border:1px solid var(--bd);background:var(--s2);flex-shrink:0;}
+.appt.current{border-color:var(--ac);box-shadow:0 0 8px rgba(0,212,255,.12);}
 .appt.done{opacity:.3;}
 .appt.missed{border-color:var(--rd);}
 .adot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
 .atm{font-size:10px;color:var(--mt);width:38px;flex-shrink:0;}
 .acd{flex:1;font-size:11px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .atp{font-size:8px;color:var(--mt);flex-shrink:0;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.ast{font-size:14px;cursor:pointer;flex-shrink:0;transition:transform .15s;}
-.ast:hover{transform:scale(1.3);}
+.ast{font-size:14px;cursor:pointer;flex-shrink:0;}
 
-.empty{display:flex;align-items:center;justify-content:center;color:var(--mt);font-size:10px;padding:14px;text-align:center;}
-
-/* Checklist modal */
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;}
 .modal.open{display:flex;}
 .modal-box{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:16px;min-width:280px;max-width:340px;}
 .modal-title{font-family:'Unbounded',sans-serif;font-size:13px;font-weight:700;margin-bottom:12px;color:var(--ac);}
 .chk-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);cursor:pointer;}
 .chk-item:last-child{border-bottom:none;}
-.chk-box{width:16px;height:16px;border-radius:3px;border:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.chk-box{width:16px;height:16px;border-radius:3px;border:1px solid var(--bd);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
 .chk-item.checked .chk-box{background:var(--gr);border-color:var(--gr);}
 .chk-item.checked .chk-box::after{content:'✓';font-size:10px;color:#000;}
 .chk-item.checked .chk-txt{color:var(--mt);text-decoration:line-through;}
 .chk-txt{font-size:12px;}
 .modal-close{margin-top:12px;width:100%;padding:8px;background:var(--s2);border:1px solid var(--bd);border-radius:7px;color:var(--tx);cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;}
+.empty{display:flex;align-items:center;justify-content:center;color:var(--mt);font-size:10px;padding:14px;text-align:center;}
+.chk-btn{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);border-radius:6px;padding:4px 8px;color:var(--ac);cursor:pointer;font-size:10px;font-family:'JetBrains Mono',monospace;flex-shrink:0;margin-left:6px;}
 </style>
 </head>
 <body>
 <div class="app">
-
-  <!-- Topbar -->
   <div class="topbar">
     <div style="display:flex;align-items:center">
       <div class="logo">DR. LOMANOV</div>
@@ -183,7 +166,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
     </div>
   </div>
 
-  <!-- Stats -->
   <div class="stats">
     <div class="st"><div class="sv" id="sT">—</div><div class="sl">Всього</div></div>
     <div class="st"><div class="sv" id="sD">—</div><div class="sl">Прийнято</div></div>
@@ -193,10 +175,8 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
     <div class="st"><div class="sv" id="sOff" style="color:var(--ac)">0</div><div class="sl">Офіційно ₴</div></div>
   </div>
 
-  <!-- Main -->
   <div class="main">
 
-    <!-- Nurse status -->
     <div class="card card-nurse">
       <div class="nlbl">Реєстратура</div>
       <div class="ndisp ns-none" id="nd">
@@ -206,19 +186,17 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
       </div>
     </div>
 
-    <!-- Next patient -->
-    <div class="card card-next" id="nextCard">
+    <div class="card card-next">
       <div class="next-time" id="nextTime">—</div>
       <div class="next-div"></div>
       <div class="next-info">
         <div class="next-code" id="nextCode">Немає записів</div>
         <div class="next-type" id="nextType">—</div>
       </div>
-      <div class="next-countdown" id="nextCountdown"></div>
-      <button id="chkBtn" style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);border-radius:6px;padding:4px 8px;color:var(--ac);cursor:pointer;font-size:10px;font-family:'JetBrains Mono',monospace;flex-shrink:0;margin-left:6px;">✓ Чекліст</button>
+      <div class="next-cd" id="nextCd"></div>
+      <button class="chk-btn" id="chkBtn">✓ Чекліст</button>
     </div>
 
-    <!-- My status -->
     <div class="card">
       <div class="cl">Мій статус</div>
       <div class="sg">
@@ -230,7 +208,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
       </div>
     </div>
 
-    <!-- Chat -->
     <div class="card">
       <div class="cl">💬 Чат з медсестрою</div>
       <div class="msgs" id="msgs"><div class="empty">Завантаження...</div></div>
@@ -243,11 +220,10 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
       </div>
       <div class="crow">
         <input class="cin" id="cin" placeholder="Написати медсестрі...">
-        <button class="csb" id="csbBtn">↑</button>
+        <button class="csb" id="sendBtn">↑</button>
       </div>
     </div>
 
-    <!-- Finance -->
     <div class="card">
       <div class="cl">💰 Фінанси сьогодні</div>
       <div class="fin-body">
@@ -259,11 +235,11 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
           <div class="fin-box" style="border-color:rgba(187,136,255,.3)"><div class="fin-lbl">Разом</div><div class="fin-val" style="color:var(--pu)" id="finTotal">0 ₴</div></div>
           <div class="fin-box" style="border-color:rgba(255,136,0,.3)"><div class="fin-lbl">Пацієнтів</div><div class="fin-val" style="color:var(--or)" id="finCount">0</div></div>
         </div>
-        <div class="fin-btns" id="finBtns">
+        <div class="fin-btns">
           <span class="fb" data-amt="550"  data-off="false">Консульт 550</span>
           <span class="fb" data-amt="1100" data-off="false">Прийом 1100</span>
           <span class="fb" data-amt="2750" data-off="false">Пакет 2750</span>
-          <span class="fb" data-amt="5040" data-off="true">Пакет 5040</span>
+          <span class="fb" data-amt="5040" data-off="true">Пакет 5040 офіц.</span>
         </div>
         <div class="fin-manual">
           <input class="fin-input" id="finAmt" type="number" placeholder="Сума ₴">
@@ -276,7 +252,6 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
       </div>
     </div>
 
-    <!-- Schedule -->
     <div class="card">
       <div class="cl">📅 Розклад сьогодні</div>
       <div class="sl-list" id="sl"><div class="empty">Завантаження...</div></div>
@@ -285,296 +260,272 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
   </div>
 </div>
 
-<!-- Checklist modal -->
 <div class="modal" id="chkModal">
   <div class="modal-box">
     <div class="modal-title">✓ Чекліст прийому</div>
     <div id="chkList"></div>
-    <button class="modal-close" onclick="closeChecklist()">Закрити</button>
+    <button class="modal-close" id="chkClose">Закрити</button>
   </div>
 </div>
 
-<script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getDatabase, ref, set, onValue, push, get }
-  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+<script>
+// ── Firebase init (compat mode) ────────────────
+firebase.initializeApp({
+  apiKey: "AIzaSyAg_Cu6fZeviw3EooBd3WB_BzI1PiceshA",
+  databaseURL: "https://lomanov-crm-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "lomanov-crm",
+  appId: "1:727432965889:web:33825368d0ef0dbb03f500"
+});
+var db = firebase.database();
 
-const db = getDatabase(initializeApp({
-  apiKey:"AIzaSyAg_Cu6fZeviw3EooBd3WB_BzI1PiceshA",
-  databaseURL:"https://lomanov-crm-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId:"lomanov-crm",
-  appId:"1:727432965889:web:33825368d0ef0dbb03f500"
-}));
-
-const rD=ref(db,'status/doctor'),rN=ref(db,'status/nurse'),
-      rC=ref(db,'chat'),rS=ref(db,'schedule/today'),
-      rF=ref(db,'finance/today');
+// ── Refs ───────────────────────────────────────
+var rD = db.ref('status/doctor');
+var rN = db.ref('status/nurse');
+var rC = db.ref('chat');
+var rS = db.ref('schedule/today');
+var rF = db.ref('finance/today');
 
 // ── Configs ────────────────────────────────────
-const nCfg={
-  none:   {i:'👤',t:'Немає пацієнтів', s:'Реєстратура вільна',      c:'ns-none'},
-  arrived:{i:'🔔',t:'Прийшов пацієнт', s:'Готує до прийому',        c:'ns-arrived'},
-  nervous:{i:'😤',t:'Нервує!',          s:'⚠️ Потрібна ваша увага!', c:'ns-nervous'},
-  gone:   {i:'✅',t:'Пішов',           s:'Пацієнт вийшов',          c:'ns-gone'},
+var nCfg = {
+  none:    {i:'👤', t:'Немає пацієнтів', s:'Реєстратура вільна',      c:'ns-none'},
+  arrived: {i:'🔔', t:'Прийшов пацієнт', s:'Готує до прийому',        c:'ns-arrived'},
+  nervous: {i:'😤', t:'Нервує!',          s:'⚠️ Потрібна ваша увага!', c:'ns-nervous'},
+  gone:    {i:'✅', t:'Пішов',           s:'Пацієнт вийшов',          c:'ns-gone'}
 };
-const dCfg={free:{e:'🟢',l:'Вільний'},ending:{e:'⚡',l:'Закінчую'},busy:{e:'🔴',l:'Зайнятий'},wait:{e:'⏳',l:'Зачекайте'},break:{e:'☕',l:'Перерва'}};
-const tC={primary:'#ff4444',repeat:'#44cc88',derm:'#44aaff',removal:'#ffaa00',massage:'#8866ff',inter:'#ff88aa'};
-const tL={primary:'Первинний',repeat:'Повторний',derm:'Дерматологія',removal:'Видалення',massage:'Масаж простати',inter:'Проміжний аналіз'};
-const stE={waiting:'⏰',arrived:'🔔',inroom:'🩺',done:'✅',missed:'❌'};
+var dCfg = {
+  free:   {e:'🟢', l:'Вільний'},
+  ending: {e:'⚡', l:'Закінчую'},
+  busy:   {e:'🔴', l:'Зайнятий'},
+  wait:   {e:'⏳', l:'Зачекайте'},
+  break:  {e:'☕', l:'Перерва'}
+};
+var tC = {primary:'#ff4444',repeat:'#44cc88',derm:'#44aaff',removal:'#ffaa00',massage:'#8866ff',inter:'#ff88aa'};
+var tL = {primary:'Первинний',repeat:'Повторний',derm:'Дерматологія',removal:'Видалення',massage:'Масаж',inter:'Проміжний'};
+var stE = {waiting:'⏰',arrived:'🔔',inroom:'🩺',done:'✅',missed:'❌'};
+var CHECKLIST = ['Скарги зібрані','Анамнез записаний','Огляд проведено','Аналізи призначені','Лікування призначено','Рекомендації дані','Повторний запропонований','Оплата прийнята'];
 
-const CHECKLIST = [
-  'Скарги зібрані','Анамнез записаний','Огляд проведено',
-  'Аналізи призначені','Лікування призначено','Рекомендації дані',
-  'Повторний прийом запропонований','Оплата прийнята'
-];
-
-// ── Nurse ──────────────────────────────────────
-onValue(rN,snap=>{
-  const d=snap.val()||{status:'none'},c=nCfg[d.status]||nCfg.none;
-  const nd=document.getElementById('nd');
-  nd.className='ndisp '+c.c;
-  document.getElementById('ni').textContent=c.i;
-  document.getElementById('ntx').textContent=c.t;
-  document.getElementById('nsb').textContent=c.s;
-  if(d.timestamp) document.getElementById('ntm').textContent=
-    new Date(d.timestamp).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+// ── Nurse status ───────────────────────────────
+rN.on('value', function(snap) {
+  var d = snap.val() || {status:'none'};
+  var c = nCfg[d.status] || nCfg.none;
+  var nd = document.getElementById('nd');
+  nd.className = 'ndisp ' + c.c;
+  document.getElementById('ni').textContent = c.i;
+  document.getElementById('ntx').textContent = c.t;
+  document.getElementById('nsb').textContent = c.s;
+  if (d.timestamp) {
+    document.getElementById('ntm').textContent =
+      new Date(d.timestamp).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+  }
 });
 
 // ── Chat ───────────────────────────────────────
-document.getElementById('msgs').innerHTML='<div class="empty">Підключення...</div>';
-
-onValue(rC,snap=>{
-  const msgs=[];
-  snap.forEach(c=>msgs.push({id:c.key,...c.val()}));
-  renderChat(msgs);
-});
-
-function renderChat(msgs){
-  const box=document.getElementById('msgs');
-  if(!msgs.length){box.innerHTML='<div class="empty">Чат порожній</div>';return;}
-  box.innerHTML='';
-  msgs.slice(-40).forEach(m=>{
-    const me=m.sender==='doctor',el=document.createElement('div');
-    el.className='msg '+(me?'me':'her');
-    const t=m.timestamp?new Date(m.timestamp).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'}):'';
-    el.innerHTML=`<div class="bbl">${esc(m.text)}</div><div class="mm">${me?'Лікар':'Медсестра'} · ${t}</div>`;
+rC.on('value', function(snap) {
+  var msgs = [];
+  snap.forEach(function(c) { msgs.push(c.val()); });
+  var box = document.getElementById('msgs');
+  box.innerHTML = '';
+  if (!msgs.length) {
+    box.innerHTML = '<div class="empty">Чат порожній</div>';
+    return;
+  }
+  msgs.slice(-40).forEach(function(m) {
+    var me = m.sender === 'doctor';
+    var el = document.createElement('div');
+    el.className = 'msg ' + (me ? 'me' : 'her');
+    var t = m.timestamp ? new Date(m.timestamp).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'}) : '';
+    el.innerHTML = '<div class="bbl">' + esc(m.text) + '</div><div class="mm">' + (me?'Лікар':'Медсестра') + ' · ' + t + '</div>';
     box.appendChild(el);
   });
-  box.scrollTop=box.scrollHeight;
+  box.scrollTop = box.scrollHeight;
+});
+
+function sendChat() {
+  var inp = document.getElementById('cin');
+  var txt = inp.value.trim();
+  if (!txt) return;
+  inp.value = '';
+  rC.push({sender:'doctor', text:txt, timestamp:Date.now()});
 }
 
+document.getElementById('sendBtn').onclick = sendChat;
+document.getElementById('cin').onkeydown = function(e) { if(e.key==='Enter') sendChat(); };
+document.querySelectorAll('.qp').forEach(function(p) {
+  p.onclick = function() {
+    document.getElementById('cin').value = p.dataset.q;
+    sendChat();
+  };
+});
+
 // ── Schedule ───────────────────────────────────
-let allAppts=[];
-onValue(rS,snap=>{
-  const d=snap.val();
-  const list=document.getElementById('sl');
-  list.innerHTML='';
-  if(!d){
-    list.innerHTML='<div class="empty">Розклад порожній.<br>Запустіть syncCalendarToFirebase</div>';
-    updateStats([]);allAppts=[];updateNextPatient();return;
+var allAppts = [];
+rS.on('value', function(snap) {
+  var d = snap.val();
+  var list = document.getElementById('sl');
+  list.innerHTML = '';
+  if (!d) {
+    list.innerHTML = '<div class="empty">Розклад порожній</div>';
+    allAppts = []; updateStats([]); updateNext(); return;
   }
-  allAppts=Object.entries(d).map(([id,v])=>({id,...v})).sort((a,b)=>a.time.localeCompare(b.time));
-  const now=new Date().toTimeString().slice(0,5);
-  allAppts.forEach(a=>{
-    const cur=a.status!=='done'&&a.status!=='missed'&&Math.abs(tm(a.time)-tm(now))<25;
-    const el=document.createElement('div');
-    el.className='appt'+(cur?' current':'')+(a.status==='done'?' done':'')+(a.status==='missed'?' missed':'');
-    el.innerHTML=`<div class="adot" style="background:${tC[a.type]||'#888'}"></div><div class="atm">${a.time}</div><div class="acd">${esc(a.code||a.name||'—')}</div><div class="atp">${tL[a.type]||''}</div><div class="ast" data-id="${a.id}" data-cur="${a.status||'waiting'}">${stE[a.status||'waiting']||'⏰'}</div>`;
+  allAppts = Object.entries(d).map(function(e) { return Object.assign({id:e[0]}, e[1]); })
+    .sort(function(a,b) { return a.time.localeCompare(b.time); });
+
+  var now = new Date().toTimeString().slice(0,5);
+  allAppts.forEach(function(a) {
+    var cur = a.status!=='done' && a.status!=='missed' && Math.abs(tm(a.time)-tm(now))<25;
+    var el = document.createElement('div');
+    el.className = 'appt' + (cur?' current':'') + (a.status==='done'?' done':'') + (a.status==='missed'?' missed':'');
+    var em = stE[a.status||'waiting'] || '⏰';
+    el.innerHTML =
+      '<div class="adot" style="background:' + (tC[a.type]||'#888') + '"></div>' +
+      '<div class="atm">' + a.time + '</div>' +
+      '<div class="acd">' + esc(a.code||a.name||'—') + '</div>' +
+      '<div class="atp">' + (tL[a.type]||'') + '</div>' +
+      '<div class="ast" data-id="' + a.id + '" data-cur="' + (a.status||'waiting') + '">' + em + '</div>';
     list.appendChild(el);
   });
   updateStats(allAppts);
-  updateNextPatient();
+  updateNext();
 });
 
-function updateStats(appts){
-  const done=appts.filter(a=>a.status==='done').length;
-  const left=appts.filter(a=>a.status!=='done'&&a.status!=='missed').length;
-  document.getElementById('sT').textContent=appts.length;
-  document.getElementById('sD').textContent=done;
-  document.getElementById('sL').textContent=left;
+document.getElementById('sl').onclick = function(e) {
+  var ast = e.target.closest ? e.target.closest('.ast') : null;
+  if (!ast) return;
+  var id = ast.dataset.id, cur = ast.dataset.cur;
+  var o = ['waiting','arrived','inroom','done','missed'];
+  db.ref('schedule/today/' + id + '/status').set(o[(o.indexOf(cur)+1) % o.length]);
+};
+
+function updateStats(appts) {
+  var done = appts.filter(function(a){return a.status==='done';}).length;
+  var left = appts.filter(function(a){return a.status!=='done'&&a.status!=='missed';}).length;
+  document.getElementById('sT').textContent = appts.length;
+  document.getElementById('sD').textContent = done;
+  document.getElementById('sL').textContent = left;
 }
 
-function updateNextPatient(){
-  const now=new Date().toTimeString().slice(0,5);
-  const next=allAppts.find(a=>a.time>now&&a.status!=='done'&&a.status!=='missed');
-  document.getElementById('sN').textContent=next?next.time:'—';
-  if(!next){
-    document.getElementById('nextTime').textContent='—';
-    document.getElementById('nextCode').textContent='Більше записів немає';
-    document.getElementById('nextType').textContent='';
-    document.getElementById('nextCountdown').textContent='';
+function updateNext() {
+  var now = new Date().toTimeString().slice(0,5);
+  var next = null;
+  for (var i=0; i<allAppts.length; i++) {
+    var a = allAppts[i];
+    if (a.time > now && a.status !== 'done' && a.status !== 'missed') { next = a; break; }
+  }
+  document.getElementById('sN').textContent = next ? next.time : '—';
+  if (!next) {
+    document.getElementById('nextTime').textContent = '—';
+    document.getElementById('nextCode').textContent = 'Більше записів немає';
+    document.getElementById('nextType').textContent = '';
+    document.getElementById('nextCd').textContent = '';
     return;
   }
-  document.getElementById('nextTime').textContent=next.time;
-  document.getElementById('nextCode').textContent=next.code||next.name||'—';
-  document.getElementById('nextType').textContent=tL[next.type]||next.type||'';
-  // Countdown
-  const diff=tm(next.time)-tm(now);
-  document.getElementById('nextCountdown').textContent=diff>0?`через ${diff} хв`:'Зараз';
+  document.getElementById('nextTime').textContent = next.time;
+  document.getElementById('nextCode').textContent = next.code || next.name || '—';
+  document.getElementById('nextType').textContent = tL[next.type] || next.type || '';
+  var diff = tm(next.time) - tm(now);
+  document.getElementById('nextCd').textContent = diff > 0 ? 'через ' + diff + ' хв' : 'Зараз';
 }
-
-// Update countdown every minute
-setInterval(updateNextPatient,60000);
-
-// ── Finance ────────────────────────────────────
-let finData={real:0,official:0,count:0};
-onValue(rF,snap=>{
-  finData=snap.val()||{real:0,official:0,count:0};
-  renderFin();
-});
-
-function renderFin(){
-  const fmt=n=>(n||0).toLocaleString('uk-UA')+'₴';
-  document.getElementById('finReal').textContent=fmt(finData.real);
-  document.getElementById('finOff').textContent=fmt(finData.official);
-  document.getElementById('finTotal').textContent=fmt((finData.real||0)+(finData.official||0));
-  document.getElementById('finCount').textContent=finData.count||0;
-  document.getElementById('sFin').textContent=Math.round((finData.real||0)/1000)+'k';
-  document.getElementById('sOff').textContent=Math.round((finData.official||0)/1000)+'k';
-}
-
-const addFin=(amt,isOfficial)=>{
-  const key=isOfficial?'official':'real';
-  set(rF,{
-    real:(finData.real||0)+(isOfficial?0:amt),
-    official:(finData.official||0)+(isOfficial?amt:0),
-    count:(finData.count||0)+1
-  });
-};
-
-const addFinManual=()=>{
-  const amt=parseInt(document.getElementById('finAmt').value);
-  const type=document.getElementById('finType').value;
-  if(!amt||amt<=0)return;
-  document.getElementById('finAmt').value='';
-  addFin(amt,type==='official');
-};
+setInterval(updateNext, 60000);
 
 // ── Doctor status ──────────────────────────────
-const setS=s=>{
-  document.querySelectorAll('.sb').forEach(b=>b.classList.toggle('active',b.dataset.s===s));
-  set(rD,{status:s,emoji:dCfg[s]?.e||'',label:dCfg[s]?.l||s,timestamp:Date.now()});
-};
+function setS(s) {
+  document.querySelectorAll('.sb').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.s === s);
+  });
+  rD.set({status:s, emoji:dCfg[s]?dCfg[s].e:'', label:dCfg[s]?dCfg[s].l:s, timestamp:Date.now()});
+}
 setS('free');
+document.querySelectorAll('.sb').forEach(function(b) {
+  b.onclick = function() { setS(b.dataset.s); };
+});
 
-// ── Event listeners (fixes ES module onclick issue) ─────
-document.querySelectorAll('.sb').forEach(b=>
-  b.addEventListener('click',()=>setS(b.dataset.s)));
+// ── Finance ────────────────────────────────────
+var finData = {real:0, official:0, count:0};
+rF.on('value', function(snap) {
+  finData = snap.val() || {real:0, official:0, count:0};
+  var fmt = function(n) { return (n||0).toLocaleString('uk-UA') + '₴'; };
+  document.getElementById('finReal').textContent = fmt(finData.real);
+  document.getElementById('finOff').textContent = fmt(finData.official);
+  document.getElementById('finTotal').textContent = fmt((finData.real||0)+(finData.official||0));
+  document.getElementById('finCount').textContent = finData.count || 0;
+  document.getElementById('sFin').textContent = Math.round((finData.real||0)/1000) + 'k';
+  document.getElementById('sOff').textContent = Math.round((finData.official||0)/1000) + 'k';
+});
 
-const sendChat=()=>{
-  const inp=document.getElementById('cin');
-  const txt=inp.value.trim();
-  if(!txt)return;
-  inp.value='';
-  push(rC,{sender:'doctor',text:txt,timestamp:Date.now()})
-    .catch(e=>console.error('Chat error:',e));
-};
+function addFin(amt, isOfficial) {
+  rF.set({
+    real: (finData.real||0) + (isOfficial ? 0 : amt),
+    official: (finData.official||0) + (isOfficial ? amt : 0),
+    count: (finData.count||0) + 1
+  });
+}
 
-document.getElementById('csbBtn').addEventListener('click',sendChat);
-document.getElementById('cin').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat();});
-document.querySelectorAll('.qp').forEach(p=>
-  p.addEventListener('click',()=>{
-    document.getElementById('cin').value=p.dataset.q;
-    sendChat();
-  }));
+document.querySelectorAll('.fb').forEach(function(b) {
+  b.onclick = function() {
+    addFin(parseInt(b.dataset.amt), b.dataset.off === 'true');
+  };
+});
 
-// ── Cycle appt status ──────────────────────────
-const cyc=(id,cur)=>{
-  const o=['waiting','arrived','inroom','done','missed'];
-  set(ref(db,`schedule/today/${id}/status`),o[(o.indexOf(cur)+1)%o.length]);
+document.getElementById('finAddBtn').onclick = function() {
+  var amt = parseInt(document.getElementById('finAmt').value);
+  var type = document.getElementById('finType').value;
+  if (!amt || amt <= 0) return;
+  document.getElementById('finAmt').value = '';
+  addFin(amt, type === 'official');
 };
 
 // ── Timer ──────────────────────────────────────
-let timerSec=0,timerRunning=false,timerInterval=null;
-const APPT_LIMIT=30*60; // 30 min default
-
-const toggleTimer=()=>{
-  if(!timerRunning){
-    timerSec=0;timerRunning=true;
-    timerInterval=setInterval(()=>{
+var timerSec = 0, timerRunning = false, timerInterval = null;
+document.getElementById('timerBadge').onclick = function() {
+  if (!timerRunning) {
+    timerSec = 0; timerRunning = true;
+    timerInterval = setInterval(function() {
       timerSec++;
-      const m=Math.floor(timerSec/60).toString().padStart(2,'0');
-      const s=(timerSec%60).toString().padStart(2,'0');
-      const badge=document.getElementById('timerBadge');
-      badge.textContent=`⏱ ${m}:${s}`;
-      if(timerSec>APPT_LIMIT) badge.className='timer-badge over';
-      else badge.className='timer-badge running';
-    },1000);
+      var m = Math.floor(timerSec/60).toString().padStart(2,'0');
+      var s = (timerSec%60).toString().padStart(2,'0');
+      var badge = document.getElementById('timerBadge');
+      badge.textContent = '⏱ ' + m + ':' + s;
+      badge.className = 'timer-badge ' + (timerSec > 1800 ? 'over' : 'running');
+    }, 1000);
   } else {
-    clearInterval(timerInterval);timerRunning=false;timerSec=0;
-    const badge=document.getElementById('timerBadge');
-    badge.textContent='⏱ 00:00';badge.className='timer-badge idle';
+    clearInterval(timerInterval); timerRunning = false; timerSec = 0;
+    var badge = document.getElementById('timerBadge');
+    badge.textContent = '⏱ 00:00'; badge.className = 'timer-badge idle';
   }
 };
 
 // ── Checklist ──────────────────────────────────
-let chkState=Array(CHECKLIST.length).fill(false);
-
-const openChecklist=()=>{
-  chkState=Array(CHECKLIST.length).fill(false);
+var chkState = CHECKLIST.map(function(){return false;});
+document.getElementById('chkBtn').onclick = function() {
+  chkState = CHECKLIST.map(function(){return false;});
   renderChecklist();
   document.getElementById('chkModal').classList.add('open');
 };
-
-
-function renderChecklist(){
-  const list=document.getElementById('chkList');
-  list.innerHTML='';
-  CHECKLIST.forEach((txt,i)=>{
-    const el=document.createElement('div');
-    el.className='chk-item'+(chkState[i]?' checked':'');
-    el.innerHTML=`<div class="chk-box"></div><div class="chk-txt">${txt}</div>`;
-    el.onclick=()=>{chkState[i]=!chkState[i];renderChecklist();};
+document.getElementById('chkClose').onclick = function() {
+  document.getElementById('chkModal').classList.remove('open');
+};
+function renderChecklist() {
+  var list = document.getElementById('chkList');
+  list.innerHTML = '';
+  CHECKLIST.forEach(function(txt, i) {
+    var el = document.createElement('div');
+    el.className = 'chk-item' + (chkState[i] ? ' checked' : '');
+    el.innerHTML = '<div class="chk-box"></div><div class="chk-txt">' + txt + '</div>';
+    el.onclick = function() { chkState[i] = !chkState[i]; renderChecklist(); };
     list.appendChild(el);
   });
 }
 
 // ── Clock ──────────────────────────────────────
-const tick=()=>{
-  document.getElementById('clk').textContent=' · '+
+function tick() {
+  document.getElementById('clk').textContent = ' · ' +
     new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-};
-tick();setInterval(tick,1000);
-
-// ── Schedule click delegation ───────────────────
-document.getElementById('sl').addEventListener('click',e=>{
-  const ast=e.target.closest('.ast');
-  if(!ast)return;
-  const id=ast.dataset.id, cur=ast.dataset.cur;
-  const o=['waiting','arrived','inroom','done','missed'];
-  set(ref(db,`schedule/today/${id}/status`),o[(o.indexOf(cur)+1)%o.length]);
-});
-
-// ── Checklist button ────────────────────────────
-document.getElementById('chkBtn') &&
-  document.getElementById('chkBtn').addEventListener('click',openChecklist);
-
-// ── Finance event listeners ─────────────────────
-document.querySelectorAll('.fb').forEach(b=>
-  b.addEventListener('click',()=>{
-    const amt=parseInt(b.dataset.amt);
-    const off=b.dataset.off==='true';
-    addFin(amt,off);
-  }));
-
-document.getElementById('finAddBtn').addEventListener('click',()=>{
-  const amt=parseInt(document.getElementById('finAmt').value);
-  const type=document.getElementById('finType').value;
-  if(!amt||amt<=0)return;
-  document.getElementById('finAmt').value='';
-  addFin(amt,type==='official');
-});
-
-// ── Timer ──────────────────────────────────────
-document.getElementById('timerBadge').addEventListener('click',toggleTimer);
-
-// ── Checklist ──────────────────────────────────
-document.querySelector('.modal-close').addEventListener('click',()=>
-  document.getElementById('chkModal').classList.remove('open'));
+}
+tick(); setInterval(tick, 1000);
 
 // ── Helpers ────────────────────────────────────
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function tm(t){const[h,m]=(t||'0:0').split(':').map(Number);return h*60+m;}
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function tm(t) { var p=(t||'0:0').split(':'); return parseInt(p[0])*60+parseInt(p[1]); }
 </script>
 </body>
 </html>

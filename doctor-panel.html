@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Лікар — Dr. Lomanov</title>
+<title>Лікар — Dr. Lomanov CRM v3</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Unbounded:wght@300;400;700&display=swap');
 :root{
@@ -341,7 +341,8 @@ onValue(rN,snap=>{
 });
 
 // ── Chat ───────────────────────────────────────
-// KEY FIX: use onValue for reading, push for writing
+document.getElementById('msgs').innerHTML='<div class="empty">Підключення...</div>';
+
 onValue(rC,snap=>{
   const msgs=[];
   snap.forEach(c=>msgs.push({id:c.key,...c.val()}));
@@ -351,7 +352,6 @@ onValue(rC,snap=>{
 function renderChat(msgs){
   const box=document.getElementById('msgs');
   if(!msgs.length){box.innerHTML='<div class="empty">Чат порожній</div>';return;}
-  // Only re-render if count changed
   box.innerHTML='';
   msgs.slice(-40).forEach(m=>{
     const me=m.sender==='doctor',el=document.createElement('div');

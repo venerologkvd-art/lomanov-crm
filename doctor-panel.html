@@ -178,7 +178,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
       <div class="clk" id="clk"></div>
     </div>
     <div style="display:flex;align-items:center;gap:10px">
-      <div class="timer-badge idle" id="timerBadge" onclick="toggleTimer()">⏱ 00:00</div>
+      <div class="timer-badge idle" id="timerBadge">⏱ 00:00</div>
       <div class="live">LIVE</div>
     </div>
   </div>
@@ -215,18 +215,18 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
         <div class="next-type" id="nextType">—</div>
       </div>
       <div class="next-countdown" id="nextCountdown"></div>
-      <button onclick="openChecklist()" style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);border-radius:6px;padding:4px 8px;color:var(--ac);cursor:pointer;font-size:10px;font-family:'JetBrains Mono',monospace;flex-shrink:0;margin-left:6px;">✓ Чекліст</button>
+      <button id="chkBtn" style="background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);border-radius:6px;padding:4px 8px;color:var(--ac);cursor:pointer;font-size:10px;font-family:'JetBrains Mono',monospace;flex-shrink:0;margin-left:6px;">✓ Чекліст</button>
     </div>
 
     <!-- My status -->
     <div class="card">
       <div class="cl">Мій статус</div>
       <div class="sg">
-        <button class="sb sf"  data-s="free"   onclick="setS('free')">  <span class="em">🟢</span><span class="lb">Вільний</span></button>
-        <button class="sb se"  data-s="ending" onclick="setS('ending')"><span class="em">⚡</span><span class="lb">Закінчую</span></button>
-        <button class="sb sbu" data-s="busy"   onclick="setS('busy')">  <span class="em">🔴</span><span class="lb">Зайнятий</span></button>
-        <button class="sb sw"  data-s="wait"   onclick="setS('wait')">  <span class="em">⏳</span><span class="lb">Зачекайте</span></button>
-        <button class="sb sbr" data-s="break"  onclick="setS('break')"> <span class="em">☕</span><span class="lb">Перерва</span></button>
+        <button class="sb sf"  data-s="free">  <span class="em">🟢</span><span class="lb">Вільний</span></button>
+        <button class="sb se"  data-s="ending"><span class="em">⚡</span><span class="lb">Закінчую</span></button>
+        <button class="sb sbu" data-s="busy">  <span class="em">🔴</span><span class="lb">Зайнятий</span></button>
+        <button class="sb sw"  data-s="wait">  <span class="em">⏳</span><span class="lb">Зачекайте</span></button>
+        <button class="sb sbr" data-s="break"> <span class="em">☕</span><span class="lb">Перерва</span></button>
       </div>
     </div>
 
@@ -235,15 +235,15 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
       <div class="cl">💬 Чат з медсестрою</div>
       <div class="msgs" id="msgs"><div class="empty">Завантаження...</div></div>
       <div class="cq">
-        <span class="qp" onclick="qs('Наступний!')">Наступний!</span>
-        <span class="qp" onclick="qs('Зачекайте 5 хв')">Зачекайте 5 хв</span>
-        <span class="qp" onclick="qs('На завтра')">На завтра</span>
-        <span class="qp" onclick="qs('☕ Кавус')">☕</span>
-        <span class="qp" onclick="qs('Добре 👍')">👍</span>
+        <span class="qp" data-q="Наступний!">Наступний!</span>
+        <span class="qp" data-q="Зачекайте 5 хв">Зачекайте 5 хв</span>
+        <span class="qp" data-q="На завтра">На завтра</span>
+        <span class="qp" data-q="☕ Кавус">☕</span>
+        <span class="qp" data-q="Добре 👍">👍</span>
       </div>
       <div class="crow">
-        <input class="cin" id="cin" placeholder="Написати медсестрі..." onkeydown="if(event.key==='Enter')sendChat()">
-        <button class="csb" onclick="sendChat()">↑</button>
+        <input class="cin" id="cin" placeholder="Написати медсестрі...">
+        <button class="csb" id="csbBtn">↑</button>
       </div>
     </div>
 
@@ -260,10 +260,10 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
           <div class="fin-box" style="border-color:rgba(255,136,0,.3)"><div class="fin-lbl">Пацієнтів</div><div class="fin-val" style="color:var(--or)" id="finCount">0</div></div>
         </div>
         <div class="fin-btns" id="finBtns">
-          <span class="fb" onclick="addFin(550,true)">Консульт 550</span>
-          <span class="fb" onclick="addFin(1100,true)">Прийом 1100</span>
-          <span class="fb" onclick="addFin(2750,false)">Пакет 2750</span>
-          <span class="fb" onclick="addFin(5040,false)">Пакет 5040</span>
+          <span class="fb" data-amt="550"  data-off="false">Консульт 550</span>
+          <span class="fb" data-amt="1100" data-off="false">Прийом 1100</span>
+          <span class="fb" data-amt="2750" data-off="false">Пакет 2750</span>
+          <span class="fb" data-amt="5040" data-off="true">Пакет 5040</span>
         </div>
         <div class="fin-manual">
           <input class="fin-input" id="finAmt" type="number" placeholder="Сума ₴">
@@ -271,7 +271,7 @@ html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrain
             <option value="real">Готівка</option>
             <option value="official">Офіційно</option>
           </select>
-          <button class="fin-add" onclick="addFinManual()">+ Додати</button>
+          <button class="fin-add" id="finAddBtn">+ Додати</button>
         </div>
       </div>
     </div>
@@ -379,7 +379,7 @@ onValue(rS,snap=>{
     const cur=a.status!=='done'&&a.status!=='missed'&&Math.abs(tm(a.time)-tm(now))<25;
     const el=document.createElement('div');
     el.className='appt'+(cur?' current':'')+(a.status==='done'?' done':'')+(a.status==='missed'?' missed':'');
-    el.innerHTML=`<div class="adot" style="background:${tC[a.type]||'#888'}"></div><div class="atm">${a.time}</div><div class="acd">${esc(a.code||a.name||'—')}</div><div class="atp">${tL[a.type]||''}</div><div class="ast" onclick="cyc('${a.id}','${a.status||'waiting'}')">${stE[a.status||'waiting']||'⏰'}</div>`;
+    el.innerHTML=`<div class="adot" style="background:${tC[a.type]||'#888'}"></div><div class="atm">${a.time}</div><div class="acd">${esc(a.code||a.name||'—')}</div><div class="atp">${tL[a.type]||''}</div><div class="ast" data-id="${a.id}" data-cur="${a.status||'waiting'}">${stE[a.status||'waiting']||'⏰'}</div>`;
     list.appendChild(el);
   });
   updateStats(allAppts);
@@ -433,7 +433,7 @@ function renderFin(){
   document.getElementById('sOff').textContent=Math.round((finData.official||0)/1000)+'k';
 }
 
-window.addFin=(amt,isOfficial)=>{
+const addFin=(amt,isOfficial)=>{
   const key=isOfficial?'official':'real';
   set(rF,{
     real:(finData.real||0)+(isOfficial?0:amt),
@@ -442,35 +442,44 @@ window.addFin=(amt,isOfficial)=>{
   });
 };
 
-window.addFinManual=()=>{
+const addFinManual=()=>{
   const amt=parseInt(document.getElementById('finAmt').value);
   const type=document.getElementById('finType').value;
   if(!amt||amt<=0)return;
   document.getElementById('finAmt').value='';
-  window.addFin(amt,type==='official');
+  addFin(amt,type==='official');
 };
 
 // ── Doctor status ──────────────────────────────
-window.setS=s=>{
+const setS=s=>{
   document.querySelectorAll('.sb').forEach(b=>b.classList.toggle('active',b.dataset.s===s));
   set(rD,{status:s,emoji:dCfg[s]?.e||'',label:dCfg[s]?.l||s,timestamp:Date.now()});
 };
 setS('free');
 
-// ── Send chat ──────────────────────────────────
-window.sendChat=()=>{
+// ── Event listeners (fixes ES module onclick issue) ─────
+document.querySelectorAll('.sb').forEach(b=>
+  b.addEventListener('click',()=>setS(b.dataset.s)));
+
+const sendChat=()=>{
   const inp=document.getElementById('cin');
   const txt=inp.value.trim();
   if(!txt)return;
   inp.value='';
-  // Use push with rC ref — KEY FIX
   push(rC,{sender:'doctor',text:txt,timestamp:Date.now()})
-    .catch(e=>console.error('Chat push error:',e));
+    .catch(e=>console.error('Chat error:',e));
 };
-window.qs=t=>{document.getElementById('cin').value=t;window.sendChat();};
+
+document.getElementById('csbBtn').addEventListener('click',sendChat);
+document.getElementById('cin').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat();});
+document.querySelectorAll('.qp').forEach(p=>
+  p.addEventListener('click',()=>{
+    document.getElementById('cin').value=p.dataset.q;
+    sendChat();
+  }));
 
 // ── Cycle appt status ──────────────────────────
-window.cyc=(id,cur)=>{
+const cyc=(id,cur)=>{
   const o=['waiting','arrived','inroom','done','missed'];
   set(ref(db,`schedule/today/${id}/status`),o[(o.indexOf(cur)+1)%o.length]);
 };
@@ -479,7 +488,7 @@ window.cyc=(id,cur)=>{
 let timerSec=0,timerRunning=false,timerInterval=null;
 const APPT_LIMIT=30*60; // 30 min default
 
-window.toggleTimer=()=>{
+const toggleTimer=()=>{
   if(!timerRunning){
     timerSec=0;timerRunning=true;
     timerInterval=setInterval(()=>{
@@ -501,12 +510,12 @@ window.toggleTimer=()=>{
 // ── Checklist ──────────────────────────────────
 let chkState=Array(CHECKLIST.length).fill(false);
 
-window.openChecklist=()=>{
+const openChecklist=()=>{
   chkState=Array(CHECKLIST.length).fill(false);
   renderChecklist();
   document.getElementById('chkModal').classList.add('open');
 };
-window.closeChecklist=()=>document.getElementById('chkModal').classList.remove('open');
+
 
 function renderChecklist(){
   const list=document.getElementById('chkList');
@@ -526,6 +535,42 @@ const tick=()=>{
     new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 };
 tick();setInterval(tick,1000);
+
+// ── Schedule click delegation ───────────────────
+document.getElementById('sl').addEventListener('click',e=>{
+  const ast=e.target.closest('.ast');
+  if(!ast)return;
+  const id=ast.dataset.id, cur=ast.dataset.cur;
+  const o=['waiting','arrived','inroom','done','missed'];
+  set(ref(db,`schedule/today/${id}/status`),o[(o.indexOf(cur)+1)%o.length]);
+});
+
+// ── Checklist button ────────────────────────────
+document.getElementById('chkBtn') &&
+  document.getElementById('chkBtn').addEventListener('click',openChecklist);
+
+// ── Finance event listeners ─────────────────────
+document.querySelectorAll('.fb').forEach(b=>
+  b.addEventListener('click',()=>{
+    const amt=parseInt(b.dataset.amt);
+    const off=b.dataset.off==='true';
+    addFin(amt,off);
+  }));
+
+document.getElementById('finAddBtn').addEventListener('click',()=>{
+  const amt=parseInt(document.getElementById('finAmt').value);
+  const type=document.getElementById('finType').value;
+  if(!amt||amt<=0)return;
+  document.getElementById('finAmt').value='';
+  addFin(amt,type==='official');
+});
+
+// ── Timer ──────────────────────────────────────
+document.getElementById('timerBadge').addEventListener('click',toggleTimer);
+
+// ── Checklist ──────────────────────────────────
+document.querySelector('.modal-close').addEventListener('click',()=>
+  document.getElementById('chkModal').classList.remove('open'));
 
 // ── Helpers ────────────────────────────────────
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}

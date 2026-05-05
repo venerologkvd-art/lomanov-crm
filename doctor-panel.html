@@ -2,944 +2,294 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Панель Лікаря — Dr. Lomanov</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Лікар — Dr. Lomanov</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Unbounded:wght@300;400;700&display=swap');
-
-  :root {
-    --bg: #0a0e14;
-    --surface: #111827;
-    --surface2: #1a2333;
-    --border: #1e2d45;
-    --accent: #00d4ff;
-    --accent2: #0066ff;
-    --green: #00ff88;
-    --red: #ff3355;
-    --yellow: #ffcc00;
-    --orange: #ff8800;
-    --purple: #bb88ff;
-    --text: #e8f0fe;
-    --muted: #4a6080;
-    --radius: 12px;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* Animated background grid */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: 
-      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .container {
-    position: relative;
-    z-index: 1;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-  }
-
-  /* Header */
-  .header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .header-title {
-    font-family: 'Unbounded', sans-serif;
-    font-size: 13px;
-    font-weight: 300;
-    letter-spacing: 0.3em;
-    color: var(--accent);
-    text-transform: uppercase;
-  }
-
-  .header-date {
-    font-size: 11px;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-  }
-
-  .live-dot {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    color: var(--green);
-    letter-spacing: 0.15em;
-  }
-
-  .live-dot::before {
-    content: '';
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--green);
-    animation: pulse 1.5s ease infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
-  }
-
-  /* Grid layout */
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
-    gap: 16px;
-  }
-
-  .block {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 20px;
-    transition: border-color 0.3s;
-  }
-
-  .block:hover { border-color: var(--accent2); }
-
-  .block-label {
-    font-size: 10px;
-    letter-spacing: 0.3em;
-    color: var(--muted);
-    text-transform: uppercase;
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .block-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* ─── БЛОК 1: Статус медсестри (великий) ─── */
-  .nurse-status-block {
-    grid-column: 1 / -1;
-  }
-
-  .nurse-status-display {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 20px 24px;
-    border-radius: 10px;
-    border: 2px solid;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    min-height: 80px;
-  }
-
-  .status-icon-large {
-    font-size: 36px;
-    line-height: 1;
-    flex-shrink: 0;
-  }
-
-  .status-text-large {
-    font-family: 'Unbounded', sans-serif;
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-  }
-
-  .status-sub {
-    font-size: 11px;
-    color: var(--muted);
-    margin-top: 4px;
-    letter-spacing: 0.1em;
-  }
-
-  .status-time {
-    margin-left: auto;
-    font-size: 11px;
-    color: var(--muted);
-    text-align: right;
-  }
-
-  /* Nurse status colors */
-  .ns-none { border-color: var(--muted); background: rgba(74,96,128,0.1); }
-  .ns-arrived { border-color: var(--yellow); background: rgba(255,204,0,0.1); }
-  .ns-nervous { border-color: var(--red); background: rgba(255,51,85,0.15); animation: flash 1s ease infinite; }
-  .ns-gone { border-color: var(--green); background: rgba(0,255,136,0.08); }
-
-  @keyframes flash {
-    0%, 100% { background: rgba(255,51,85,0.15); }
-    50% { background: rgba(255,51,85,0.3); }
-  }
-
-  /* ─── БЛОК 2: Мій статус ─── */
-  .my-status-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-  }
-
-  .status-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 14px 8px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    cursor: pointer;
-    transition: all 0.2s;
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--text);
-    font-size: 10px;
-    letter-spacing: 0.05em;
-    text-align: center;
-  }
-
-  .status-btn:hover {
-    border-color: var(--accent);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0,212,255,0.2);
-  }
-
-  .status-btn.active {
-    border-color: currentColor;
-    box-shadow: 0 0 20px currentColor;
-    transform: scale(1.02);
-  }
-
-  .status-btn .emoji { font-size: 24px; }
-  .status-btn .label { color: var(--muted); }
-  .status-btn.active .label { color: inherit; }
-
-  .btn-free { color: var(--green); }
-  .btn-ending { color: var(--yellow); }
-  .btn-busy { color: var(--red); }
-  .btn-wait { color: var(--orange); }
-  .btn-break { color: var(--purple); }
-
-  /* ─── БЛОК 3: Чат ─── */
-  .chat-block {
-    display: flex;
-    flex-direction: column;
-    height: 320px;
-  }
-
-  .chat-messages {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding-right: 4px;
-    margin-bottom: 12px;
-  }
-
-  .chat-messages::-webkit-scrollbar { width: 4px; }
-  .chat-messages::-webkit-scrollbar-track { background: transparent; }
-  .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .msg {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    max-width: 85%;
-  }
-
-  .msg.from-me { align-self: flex-end; align-items: flex-end; }
-  .msg.from-nurse { align-self: flex-start; align-items: flex-start; }
-
-  .msg-bubble {
-    padding: 8px 12px;
-    border-radius: 10px;
-    font-size: 13px;
-    line-height: 1.5;
-  }
-
-  .from-me .msg-bubble {
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    color: #fff;
-    border-bottom-right-radius: 3px;
-  }
-
-  .from-nurse .msg-bubble {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-bottom-left-radius: 3px;
-  }
-
-  .msg-meta {
-    font-size: 10px;
-    color: var(--muted);
-    padding: 0 4px;
-  }
-
-  .chat-input-row {
-    display: flex;
-    gap: 8px;
-  }
-
-  .chat-input {
-    flex: 1;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    color: var(--text);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  .chat-input:focus { border-color: var(--accent2); }
-  .chat-input::placeholder { color: var(--muted); }
-
-  .chat-send {
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    border: none;
-    border-radius: 8px;
-    padding: 10px 16px;
-    color: #fff;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.2s;
-  }
-
-  .chat-send:hover { transform: scale(1.05); filter: brightness(1.1); }
-
-  /* ─── БЛОК 4: Розклад ─── */
-  .schedule-block {
-    display: flex;
-    flex-direction: column;
-    height: 320px;
-    overflow: hidden;
-  }
-
-  .schedule-list {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    padding-right: 4px;
-  }
-
-  .schedule-list::-webkit-scrollbar { width: 4px; }
-  .schedule-list::-webkit-scrollbar-track { background: transparent; }
-  .schedule-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .appt {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    transition: all 0.2s;
-    cursor: pointer;
-  }
-
-  .appt:hover { border-color: var(--accent2); }
-  .appt.current { border-color: var(--accent); box-shadow: 0 0 12px rgba(0,212,255,0.2); }
-  .appt.done { opacity: 0.4; }
-  .appt.missed { border-color: var(--red); }
-
-  .appt-dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .appt-time {
-    font-size: 12px;
-    color: var(--muted);
-    width: 50px;
-    flex-shrink: 0;
-  }
-
-  .appt-name {
-    flex: 1;
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  .appt-type {
-    font-size: 10px;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-  }
-
-  .appt-status {
-    font-size: 18px;
-    cursor: pointer;
-    transition: transform 0.2s;
-  }
-
-  .appt-status:hover { transform: scale(1.3); }
-
-  /* Color dots by type */
-  .dot-primary { background: #ff4444; }
-  .dot-repeat { background: #44cc88; }
-  .dot-derm { background: #44aaff; }
-  .dot-removal { background: #ffaa00; }
-  .dot-massage { background: #8866ff; }
-  .dot-inter { background: #ff88aa; }
-
-  /* Connection status */
-  .conn-status {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 11px;
-    letter-spacing: 0.1em;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    z-index: 100;
-    transition: all 0.3s;
-  }
-
-  .conn-status.connected {
-    background: rgba(0,255,136,0.15);
-    border: 1px solid rgba(0,255,136,0.4);
-    color: var(--green);
-  }
-
-  .conn-status.disconnected {
-    background: rgba(255,51,85,0.15);
-    border: 1px solid rgba(255,51,85,0.4);
-    color: var(--red);
-  }
-
-  .conn-status::before {
-    content: '';
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-  }
-
-  /* Toast notification */
-  .toast {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 12px 20px;
-    background: var(--surface);
-    border: 1px solid var(--accent);
-    border-radius: 10px;
-    font-size: 13px;
-    z-index: 200;
-    transform: translateY(-100px);
-    opacity: 0;
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    max-width: 300px;
-  }
-
-  .toast.show { transform: translateY(0); opacity: 1; }
-
-  /* Loading state */
-  .loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 30px;
-    color: var(--muted);
-    font-size: 12px;
-    letter-spacing: 0.2em;
-  }
-
-  .spinner {
-    width: 16px;
-    height: 16px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* Quick message pills */
-  .quick-msgs {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    margin-bottom: 8px;
-  }
-
-  .quick-pill {
-    padding: 4px 10px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    font-size: 11px;
-    cursor: pointer;
-    color: var(--muted);
-    transition: all 0.2s;
-    background: var(--surface2);
-  }
-
-  .quick-pill:hover {
-    border-color: var(--accent2);
-    color: var(--text);
-    background: rgba(0,102,255,0.15);
-  }
-
-  /* Stats bar */
-  .stats-bar {
-    display: flex;
-    gap: 16px;
-    padding: 12px 16px;
-    background: var(--surface2);
-    border-radius: 8px;
-    margin-bottom: 16px;
-    border: 1px solid var(--border);
-  }
-
-  .stat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    flex: 1;
-  }
-
-  .stat-val {
-    font-family: 'Unbounded', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--accent);
-  }
-
-  .stat-lbl {
-    font-size: 9px;
-    color: var(--muted);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    text-align: center;
-  }
-
-  .stat-sep { width: 1px; background: var(--border); }
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Unbounded:wght@300;400;700&display=swap');
+
+:root {
+  --bg:#080d14; --s1:#0f1923; --s2:#162030; --bd:#1e3050;
+  --ac:#00d4ff; --ac2:#0066ff;
+  --gr:#00ff88; --rd:#ff3355; --yl:#ffcc00; --or:#ff8800; --pu:#bb88ff;
+  --tx:#ddeeff; --mt:#3a5575; --r:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--tx);font-family:'JetBrains Mono',monospace;overflow:hidden;}
+
+.app{display:grid;height:100vh;grid-template-rows:44px 36px 1fr;}
+
+/* Topbar */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--bd);background:var(--s1);}
+.logo{font-family:'Unbounded',sans-serif;font-size:11px;font-weight:700;color:var(--ac);letter-spacing:.2em;}
+.clk{font-size:11px;color:var(--mt);letter-spacing:.08em;margin-left:12px;}
+.live{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--gr);letter-spacing:.2em;}
+.live::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--gr);animation:blink 1.4s ease infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--bd);background:var(--s1);}
+.stat{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;border-right:1px solid var(--bd);}
+.stat:last-child{border-right:none;}
+.sv{font-family:'Unbounded',sans-serif;font-size:15px;font-weight:700;color:var(--ac);}
+.sl{font-size:9px;color:var(--mt);letter-spacing:.1em;text-transform:uppercase;}
+
+/* Main grid */
+.main{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:68px 1fr 1fr;gap:8px;padding:8px;overflow:hidden;min-height:0;}
+
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);display:flex;flex-direction:column;overflow:hidden;min-height:0;}
+.clabel{font-size:9px;letter-spacing:.28em;color:var(--mt);text-transform:uppercase;padding:6px 10px 5px;border-bottom:1px solid var(--bd);flex-shrink:0;}
+
+/* Nurse (full width row 1) */
+.card-nurse{grid-column:1/-1;flex-direction:row;align-items:stretch;}
+.nlabel{font-size:9px;letter-spacing:.2em;color:var(--mt);text-transform:uppercase;padding:0 12px;width:130px;flex-shrink:0;border-right:1px solid var(--bd);display:flex;align-items:center;}
+.ndisp{flex:1;display:flex;align-items:center;gap:12px;padding:0 16px;transition:background .4s;}
+.ni{font-size:28px;flex-shrink:0;}
+.nt{font-family:'Unbounded',sans-serif;font-size:15px;font-weight:700;}
+.nsub{font-size:10px;color:var(--mt);margin-top:2px;}
+.ntm{margin-left:auto;font-size:10px;color:var(--mt);}
+
+.ns-none{background:rgba(58,85,117,.07);}
+.ns-arrived{background:rgba(255,204,0,.09);border-color:var(--yl)!important;}
+.ns-nervous{background:rgba(255,51,85,.13);border-color:var(--rd)!important;animation:nflash 1.2s ease infinite;}
+.ns-gone{background:rgba(0,255,136,.07);border-color:var(--gr)!important;}
+@keyframes nflash{0%,100%{background:rgba(255,51,85,.13)}50%{background:rgba(255,51,85,.26)}}
+
+/* My status (row 2 col 1) */
+.sg{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;padding:7px;flex:1;}
+.sb{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:6px 2px;border-radius:7px;border:1px solid var(--bd);background:var(--s2);cursor:pointer;transition:all .17s;font-family:'JetBrains Mono',monospace;color:var(--tx);font-size:9px;letter-spacing:.03em;text-align:center;user-select:none;}
+.sb:hover{border-color:var(--ac2);transform:translateY(-1px);}
+.sb.active{box-shadow:0 0 14px currentColor;transform:scale(1.04);border-color:currentColor;}
+.sb .em{font-size:18px;}
+.sb .lb{color:var(--mt);}
+.sb.active .lb{color:inherit;}
+.sf{color:var(--gr);} .se{color:var(--yl);} .sbu{color:var(--rd);} .sw{color:var(--or);} .sbr{color:var(--pu);}
+
+/* Chat (row 2 col 2) */
+.msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px;padding:7px;min-height:0;}
+.msgs::-webkit-scrollbar{width:3px;}
+.msgs::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
+.msg{display:flex;flex-direction:column;gap:2px;max-width:86%;}
+.msg.me{align-self:flex-end;align-items:flex-end;}
+.msg.her{align-self:flex-start;align-items:flex-start;}
+.bbl{padding:5px 9px;border-radius:9px;font-size:12px;line-height:1.4;word-break:break-word;}
+.me .bbl{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;border-bottom-right-radius:3px;}
+.her .bbl{background:var(--s2);border:1px solid var(--bd);border-bottom-left-radius:3px;}
+.mm{font-size:9px;color:var(--mt);padding:0 3px;}
+
+.cq{display:flex;gap:4px;padding:4px 7px;overflow-x:auto;flex-shrink:0;border-top:1px solid var(--bd);}
+.cq::-webkit-scrollbar{display:none;}
+.qp{flex-shrink:0;padding:3px 8px;border-radius:12px;border:1px solid var(--bd);font-size:10px;cursor:pointer;color:var(--mt);background:var(--s2);white-space:nowrap;font-family:'JetBrains Mono',monospace;transition:all .15s;}
+.qp:hover{border-color:var(--ac2);color:var(--tx);}
+
+.crow{display:flex;gap:5px;padding:5px 7px;border-top:1px solid var(--bd);flex-shrink:0;}
+.cin{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:6px;padding:6px 9px;color:var(--tx);font-family:'JetBrains Mono',monospace;font-size:12px;outline:none;transition:border-color .2s;}
+.cin:focus{border-color:var(--ac2);}
+.cin::placeholder{color:var(--mt);}
+.csb{background:linear-gradient(135deg,var(--ac2),var(--ac));border:none;border-radius:6px;padding:6px 11px;color:#fff;cursor:pointer;font-size:14px;flex-shrink:0;}
+
+/* Schedule (row 3, full width) */
+.card-sched{grid-column:1/-1;}
+.sl-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:3px;padding:5px 7px;min-height:0;}
+.sl-list::-webkit-scrollbar{width:3px;}
+.sl-list::-webkit-scrollbar-thumb{background:var(--bd);border-radius:2px;}
+.appt{display:flex;align-items:center;gap:7px;padding:5px 9px;border-radius:6px;border:1px solid var(--bd);background:var(--s2);flex-shrink:0;}
+.appt.current{border-color:var(--ac);box-shadow:0 0 9px rgba(0,212,255,.14);}
+.appt.done{opacity:.35;}
+.appt.missed{border-color:var(--rd);}
+.adot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.atm{font-size:11px;color:var(--mt);width:40px;flex-shrink:0;}
+.acd{flex:1;font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.atp{font-size:9px;color:var(--mt);flex-shrink:0;}
+.ast{font-size:15px;cursor:pointer;flex-shrink:0;transition:transform .15s;}
+.ast:hover{transform:scale(1.3);}
+
+.empty{display:flex;align-items:center;justify-content:center;color:var(--mt);font-size:11px;padding:14px;text-align:center;letter-spacing:.05em;}
+
+/* ── MOBILE ── */
+@media(max-width:680px){
+  html,body{overflow:auto;}
+  .app{height:auto;min-height:100vh;grid-template-rows:auto auto auto;overflow:visible;}
+  .main{grid-template-columns:1fr;grid-template-rows:auto auto auto auto;overflow:visible;height:auto;}
+  .card-nurse{flex-direction:column;height:auto;}
+  .nlabel{width:100%;height:auto;padding:7px 12px;border-right:none;border-bottom:1px solid var(--bd);}
+  .ndisp{padding:10px 14px;}
+  .card{height:auto;min-height:0;}
+  .msgs{max-height:180px;}
+  .sl-list{max-height:260px;}
+  .card-sched{grid-column:1;}
+  .nt{font-size:14px;}
+  .sv{font-size:14px;}
+}
 </style>
 </head>
 <body>
+<div class="app">
 
-<div class="container">
-  <!-- Header -->
-  <div class="header">
-    <div>
-      <div class="header-title">Панель Лікаря</div>
-      <div class="header-date" id="currentDateTime"></div>
+  <div class="topbar">
+    <div style="display:flex;align-items:center">
+      <div class="logo">DR. LOMANOV</div>
+      <div class="clk" id="clk"></div>
     </div>
-    <div class="live-dot">LIVE</div>
+    <div class="live">LIVE</div>
   </div>
 
-  <!-- Stats bar -->
-  <div class="stats-bar">
-    <div class="stat-item">
-      <div class="stat-val" id="statTotal">—</div>
-      <div class="stat-lbl">Сьогодні</div>
-    </div>
-    <div class="stat-sep"></div>
-    <div class="stat-item">
-      <div class="stat-val" id="statDone">—</div>
-      <div class="stat-lbl">Прийнято</div>
-    </div>
-    <div class="stat-sep"></div>
-    <div class="stat-item">
-      <div class="stat-val" id="statLeft">—</div>
-      <div class="stat-lbl">Залишилось</div>
-    </div>
-    <div class="stat-sep"></div>
-    <div class="stat-item">
-      <div class="stat-val" id="statNext">—</div>
-      <div class="stat-lbl">Наступний</div>
-    </div>
+  <div class="stats">
+    <div class="stat"><div class="sv" id="sT">—</div><div class="sl">Сьогодні</div></div>
+    <div class="stat"><div class="sv" id="sD">—</div><div class="sl">Прийнято</div></div>
+    <div class="stat"><div class="sv" id="sL">—</div><div class="sl">Залишилось</div></div>
+    <div class="stat"><div class="sv" id="sN">—</div><div class="sl">Наступний</div></div>
   </div>
 
-  <div class="grid">
+  <div class="main">
 
-    <!-- Блок 1: Статус реєстратури (від медсестри) -->
-    <div class="block nurse-status-block">
-      <div class="block-label">🩺 Статус реєстратури</div>
-      <div class="nurse-status-display ns-none" id="nurseStatusDisplay">
-        <div class="status-icon-large" id="nurseStatusIcon">👤</div>
-        <div>
-          <div class="status-text-large" id="nurseStatusText">Очікування</div>
-          <div class="status-sub" id="nurseStatusSub">Медсестра ще не відзначилась</div>
-        </div>
-        <div class="status-time" id="nurseStatusTime"></div>
+    <!-- Nurse -->
+    <div class="card card-nurse">
+      <div class="nlabel">Реєстратура</div>
+      <div class="ndisp ns-none" id="nd">
+        <div class="ni" id="ni">👤</div>
+        <div><div class="nt" id="ntx">Пацієнтів немає</div><div class="nsub" id="nsb">Медсестра не відзначилась</div></div>
+        <div class="ntm" id="ntm"></div>
       </div>
     </div>
 
-    <!-- Блок 2: Мій статус -->
-    <div class="block">
-      <div class="block-label">🔵 Мій статус</div>
-      <div class="my-status-grid">
-        <button class="status-btn btn-free" data-status="free" onclick="setMyStatus('free')">
-          <span class="emoji">🟢</span>
-          <span class="label">Вільний</span>
-        </button>
-        <button class="status-btn btn-ending" data-status="ending" onclick="setMyStatus('ending')">
-          <span class="emoji">⚡</span>
-          <span class="label">Закінчую</span>
-        </button>
-        <button class="status-btn btn-busy" data-status="busy" onclick="setMyStatus('busy')">
-          <span class="emoji">🔴</span>
-          <span class="label">Зайнятий</span>
-        </button>
-        <button class="status-btn btn-wait" data-status="wait" onclick="setMyStatus('wait')">
-          <span class="emoji">⏳</span>
-          <span class="label">Зачекайте</span>
-        </button>
-        <button class="status-btn btn-break" data-status="break" onclick="setMyStatus('break')">
-          <span class="emoji">☕</span>
-          <span class="label">Перерва</span>
-        </button>
+    <!-- My status -->
+    <div class="card">
+      <div class="clabel">Мій статус</div>
+      <div class="sg">
+        <button class="sb sf"  data-s="free"   onclick="setS('free')">  <span class="em">🟢</span><span class="lb">Вільний</span></button>
+        <button class="sb se"  data-s="ending" onclick="setS('ending')"><span class="em">⚡</span><span class="lb">Закінчую</span></button>
+        <button class="sb sbu" data-s="busy"   onclick="setS('busy')">  <span class="em">🔴</span><span class="lb">Зайнятий</span></button>
+        <button class="sb sw"  data-s="wait"   onclick="setS('wait')">  <span class="em">⏳</span><span class="lb">Зачекайте</span></button>
+        <button class="sb sbr" data-s="break"  onclick="setS('break')"> <span class="em">☕</span><span class="lb">Перерва</span></button>
       </div>
     </div>
 
-    <!-- Блок 3: Чат -->
-    <div class="block chat-block">
-      <div class="block-label">💬 Чат з медсестрою</div>
-      <div class="chat-messages" id="chatMessages">
-        <div class="loading"><div class="spinner"></div>Завантаження...</div>
+    <!-- Chat -->
+    <div class="card">
+      <div class="clabel">💬 Чат з медсестрою</div>
+      <div class="msgs" id="msgs"><div class="empty">Завантаження...</div></div>
+      <div class="cq">
+        <span class="qp" onclick="qs('Наступний!')">Наступний!</span>
+        <span class="qp" onclick="qs('Зачекайте 5 хв')">Зачекайте 5 хв</span>
+        <span class="qp" onclick="qs('Запишіть на завтра')">На завтра</span>
+        <span class="qp" onclick="qs('☕ Кавус')">☕</span>
+        <span class="qp" onclick="qs('Добре 👍')">👍</span>
       </div>
-      <div class="quick-msgs">
-        <span class="quick-pill" onclick="sendQuick('Наступний!')">Наступний!</span>
-        <span class="quick-pill" onclick="sendQuick('Зачекайте 5 хв')">Зачекайте 5 хв</span>
-        <span class="quick-pill" onclick="sendQuick('Запишіть на завтра')">Запишіть на завтра</span>
-        <span class="quick-pill" onclick="sendQuick('Кавус ☕')">Кавус ☕</span>
-      </div>
-      <div class="chat-input-row">
-        <input class="chat-input" id="chatInput" placeholder="Написати медсестрі..." onkeydown="if(event.key==='Enter')sendChat()">
-        <button class="chat-send" onclick="sendChat()">↑</button>
+      <div class="crow">
+        <input class="cin" id="cin" placeholder="Написати медсестрі..." onkeydown="if(event.key==='Enter')cs()">
+        <button class="csb" onclick="cs()">↑</button>
       </div>
     </div>
 
-    <!-- Блок 4: Розклад -->
-    <div class="block schedule-block">
-      <div class="block-label">📅 Розклад на сьогодні</div>
-      <div class="schedule-list" id="scheduleList">
-        <div class="loading"><div class="spinner"></div>Завантаження...</div>
-      </div>
+    <!-- Schedule full width -->
+    <div class="card card-sched">
+      <div class="clabel">📅 Розклад сьогодні</div>
+      <div class="sl-list" id="sl"><div class="empty">Завантаження...</div></div>
     </div>
 
   </div>
 </div>
 
-<!-- Connection status -->
-<div class="conn-status disconnected" id="connStatus">З'єднання...</div>
-
-<!-- Toast -->
-<div class="toast" id="toast"></div>
-
-<!-- Firebase SDK -->
 <script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getDatabase, ref, set, onValue, push, serverTimestamp, onDisconnect }
-    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, onValue, push }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
-  // ── Firebase config ──────────────────────────────────────────────
-  const firebaseConfig = {
-    apiKey: "AIzaSyAg_Cu6fZeviw3EooBd3WB_BzI1PiceshA",
-    databaseURL: "https://lomanov-crm-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "lomanov-crm",
-    appId: "1:727432965889:web:33825368d0ef0dbb03f500"
-  };
+const db = getDatabase(initializeApp({
+  apiKey:"AIzaSyAg_Cu6fZeviw3EooBd3WB_BzI1PiceshA",
+  databaseURL:"https://lomanov-crm-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"lomanov-crm",
+  appId:"1:727432965889:web:33825368d0ef0dbb03f500"
+}));
 
-  const app = initializeApp(firebaseConfig);
-  const db  = getDatabase(app);
+const rD=ref(db,'status/doctor'), rN=ref(db,'status/nurse'),
+      rC=ref(db,'chat'), rS=ref(db,'schedule/today');
 
-  // ── Refs ─────────────────────────────────────────────────────────
-  const doctorStatusRef = ref(db, 'status/doctor');
-  const nurseStatusRef  = ref(db, 'status/nurse');
-  const chatRef         = ref(db, 'chat');
-  const scheduleRef     = ref(db, 'schedule/today');
-  const connRef         = ref(db, '.info/connected');
+const nCfg={
+  none:   {i:'👤',t:'Пацієнтів немає',   s:'Реєстратура вільна',      c:'ns-none'},
+  arrived:{i:'🔔',t:'Прийшов пацієнт',   s:'Готує до прийому',        c:'ns-arrived'},
+  nervous:{i:'😤',t:'Нервує!',            s:'⚠️ Потрібна ваша увага!', c:'ns-nervous'},
+  gone:   {i:'✅',t:'Пішов',             s:'Пацієнт вийшов',          c:'ns-gone'},
+};
+const dCfg={free:{e:'🟢',l:'Вільний'},ending:{e:'⚡',l:'Закінчую'},busy:{e:'🔴',l:'Зайнятий'},wait:{e:'⏳',l:'Зачекайте'},break:{e:'☕',l:'Перерва'}};
+const tC={primary:'#ff4444',repeat:'#44cc88',derm:'#44aaff',removal:'#ffaa00',massage:'#8866ff',inter:'#ff88aa'};
+const tL={primary:'Первинний',repeat:'Повторний',derm:'Дерматологія',removal:'Видалення',massage:'Масаж',inter:'Проміжний'};
 
-  // ── Current state ────────────────────────────────────────────────
-  let myStatus = 'free';
+onValue(rN,snap=>{
+  const d=snap.val()||{status:'none'}, c=nCfg[d.status]||nCfg.none, nd=document.getElementById('nd');
+  nd.className='ndisp '+c.c;
+  document.getElementById('ni').textContent=c.i;
+  document.getElementById('ntx').textContent=c.t;
+  document.getElementById('nsb').textContent=c.s;
+  if(d.timestamp) document.getElementById('ntm').textContent=
+    new Date(d.timestamp).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'});
+});
 
-  // ── Nurse status configs ─────────────────────────────────────────
-  const nurseStatuses = {
-    none:    { icon:'👤', text:'Пацієнтів немає', sub:'Реєстратура вільна', cls:'ns-none' },
-    arrived: { icon:'🔔', text:'Прийшов пацієнт', sub:'Готує до прийому', cls:'ns-arrived' },
-    nervous: { icon:'😤', text:'Нервує / Пресингує', sub:'⚠️ Потрібна увага', cls:'ns-nervous' },
-    gone:    { icon:'✅', text:'Пішов', sub:'Пацієнт вийшов з кабінету', cls:'ns-gone' },
-  };
-
-  // ── Doctor status configs ─────────────────────────────────────────
-  const doctorStatuses = {
-    free:   { emoji:'🟢', label:'Вільний' },
-    ending: { emoji:'⚡', label:'Закінчую' },
-    busy:   { emoji:'🔴', label:'Зайнятий' },
-    wait:   { emoji:'⏳', label:'Зачекайте' },
-    break:  { emoji:'☕', label:'Перерва' },
-  };
-
-  // ── Appointment type colors ───────────────────────────────────────
-  const typeColors = {
-    primary: '#ff4444', repeat: '#44cc88', derm: '#44aaff',
-    removal: '#ffaa00', massage: '#8866ff', inter: '#ff88aa'
-  };
-
-  const typeLabels = {
-    primary:'Первинний', repeat:'Повторний', derm:'Дерматологія',
-    removal:'Видалення', massage:'Масаж простати', inter:'Проміжний аналіз'
-  };
-
-  // ── Connection ────────────────────────────────────────────────────
-  onValue(connRef, snap => {
-    const online = snap.val();
-    const el = document.getElementById('connStatus');
-    el.textContent = online ? 'Firebase підключено' : 'Офлайн';
-    el.className = 'conn-status ' + (online ? 'connected' : 'disconnected');
+onValue(rC,snap=>{
+  const msgs=[];
+  snap.forEach(c=>msgs.push({id:c.key,...c.val()}));
+  const box=document.getElementById('msgs');
+  box.innerHTML='';
+  if(!msgs.length){box.innerHTML='<div class="empty">Чат порожній</div>';return;}
+  msgs.slice(-40).forEach(m=>{
+    const me=m.sender==='doctor', el=document.createElement('div');
+    el.className='msg '+(me?'me':'her');
+    const t=m.timestamp?new Date(m.timestamp).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'}):'';
+    el.innerHTML=`<div class="bbl">${esc(m.text)}</div><div class="mm">${me?'Лікар':'Медсестра'} · ${t}</div>`;
+    box.appendChild(el);
   });
+  box.scrollTop=box.scrollHeight;
+});
 
-  // ── Nurse status listener ─────────────────────────────────────────
-  onValue(nurseStatusRef, snap => {
-    const data = snap.val() || { status: 'none' };
-    const cfg  = nurseStatuses[data.status] || nurseStatuses.none;
-    const disp = document.getElementById('nurseStatusDisplay');
-
-    disp.className = 'nurse-status-display ' + cfg.cls;
-    document.getElementById('nurseStatusIcon').textContent = cfg.icon;
-    document.getElementById('nurseStatusText').textContent = cfg.text;
-    document.getElementById('nurseStatusSub').textContent  = cfg.sub;
-
-    if (data.timestamp) {
-      const d = new Date(data.timestamp);
-      document.getElementById('nurseStatusTime').textContent =
-        d.toLocaleTimeString('uk-UA', {hour:'2-digit', minute:'2-digit'});
-    }
-
-    // Notify on nurse arrived
-    if (data.status === 'arrived') showToast('🔔 Медсестра: прийшов пацієнт!');
-    if (data.status === 'nervous') showToast('😤 Увага! Пацієнт нервує');
+onValue(rS,snap=>{
+  const d=snap.val(), list=document.getElementById('sl');
+  list.innerHTML='';
+  if(!d){
+    list.innerHTML='<div class="empty">Запустіть syncCalendarToFirebase в Apps Script</div>';
+    ['sT','sD','sL'].forEach(id=>document.getElementById(id).textContent='0');
+    document.getElementById('sN').textContent='—';
+    return;
+  }
+  const appts=Object.entries(d).map(([id,v])=>({id,...v})).sort((a,b)=>a.time.localeCompare(b.time));
+  const now=new Date().toTimeString().slice(0,5);
+  let done=0,left=0,nxt=null;
+  appts.forEach(a=>{
+    const cur=a.status!=='done'&&a.status!=='missed'&&Math.abs(tm(a.time)-tm(now))<25;
+    if(a.status==='done') done++; else{left++;if(!nxt)nxt=a.time;}
+    const el=document.createElement('div');
+    el.className='appt'+(cur?' current':'')+(a.status==='done'?' done':'')+(a.status==='missed'?' missed':'');
+    const em={waiting:'⏰',arrived:'🔔',inroom:'🩺',done:'✅',missed:'❌'}[a.status||'waiting']||'⏰';
+    el.innerHTML=`<div class="adot" style="background:${tC[a.type]||'#888'}"></div><div class="atm">${a.time}</div><div class="acd">${esc(a.code||a.name||'—')}</div><div class="atp">${tL[a.type]||''}</div><div class="ast" onclick="cyc('${a.id}','${a.status||'waiting'}')">${em}</div>`;
+    list.appendChild(el);
   });
+  document.getElementById('sT').textContent=appts.length;
+  document.getElementById('sD').textContent=done;
+  document.getElementById('sL').textContent=left;
+  document.getElementById('sN').textContent=nxt||'—';
+});
 
-  // ── Chat listener ─────────────────────────────────────────────────
-  onValue(chatRef, snap => {
-    const msgs = [];
-    snap.forEach(child => msgs.push({ id: child.key, ...child.val() }));
-    renderChat(msgs);
-  });
+window.setS=s=>{
+  document.querySelectorAll('.sb').forEach(b=>b.classList.toggle('active',b.dataset.s===s));
+  set(rD,{status:s,emoji:dCfg[s]?.e||'',label:dCfg[s]?.l||s,timestamp:Date.now()});
+};
+setS('free');
 
-  function renderChat(msgs) {
-    const container = document.getElementById('chatMessages');
-    container.innerHTML = '';
+window.cs=()=>{
+  const i=document.getElementById('cin'), t=i.value.trim();
+  if(!t)return; i.value='';
+  push(rC,{sender:'doctor',text:t,timestamp:Date.now()});
+};
+window.qs=t=>{document.getElementById('cin').value=t;window.cs();};
+window.cyc=(id,cur)=>{
+  const o=['waiting','arrived','inroom','done','missed'];
+  set(ref(db,`schedule/today/${id}/status`),o[(o.indexOf(cur)+1)%o.length]);
+};
 
-    if (msgs.length === 0) {
-      container.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px">Чат порожній</div>';
-      return;
-    }
+const tick=()=>{document.getElementById('clk').textContent=' · '+new Date().toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});};
+tick();setInterval(tick,1000);
 
-    msgs.slice(-30).forEach(msg => {
-      const fromMe = msg.sender === 'doctor';
-      const el = document.createElement('div');
-      el.className = 'msg ' + (fromMe ? 'from-me' : 'from-nurse');
-
-      const time = msg.timestamp
-        ? new Date(msg.timestamp).toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit'})
-        : '';
-
-      el.innerHTML = `
-        <div class="msg-bubble">${escHtml(msg.text)}</div>
-        <div class="msg-meta">${fromMe?'Лікар':'Медсестра'} · ${time}</div>
-      `;
-      container.appendChild(el);
-    });
-
-    container.scrollTop = container.scrollHeight;
-  }
-
-  // ── Schedule listener ─────────────────────────────────────────────
-  onValue(scheduleRef, snap => {
-    const data = snap.val();
-    renderSchedule(data);
-  });
-
-  function renderSchedule(data) {
-    const list = document.getElementById('scheduleList');
-
-    if (!data) {
-      list.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:30px">📅 Розклад порожній.<br>Дані підтягуються з Google Calendar.</div>';
-      updateStats([], []);
-      return;
-    }
-
-    const appts = Object.entries(data).map(([id, v]) => ({ id, ...v }))
-      .sort((a,b) => a.time.localeCompare(b.time));
-
-    list.innerHTML = '';
-    const now = new Date();
-    const nowStr = now.toTimeString().slice(0,5);
-
-    let doneCount = 0, leftCount = 0, nextTime = null;
-
-    appts.forEach(appt => {
-      const isPast = appt.time < nowStr && appt.status === 'done';
-      const isCurrent = Math.abs(timeToMins(appt.time) - timeToMins(nowStr)) < 20 && appt.status !== 'done';
-      if (appt.status === 'done') doneCount++;
-      else { leftCount++; if (!nextTime) nextTime = appt.time; }
-
-      const el = document.createElement('div');
-      el.className = 'appt' + (isCurrent?' current':'') + (appt.status==='done'?' done':'') + (appt.status==='missed'?' missed':'');
-
-      const color = typeColors[appt.type] || '#888';
-      const label = typeLabels[appt.type] || appt.type;
-
-      const statusEmoji = {
-        waiting:'⏰', arrived:'🔔', inroom:'🩺', done:'✅', missed:'❌'
-      }[appt.status || 'waiting'] || '⏰';
-
-      el.innerHTML = `
-        <div class="appt-dot" style="background:${color}"></div>
-        <div class="appt-time">${appt.time}</div>
-        <div class="appt-name">${escHtml(appt.code || appt.name || '—')}</div>
-        <div class="appt-type">${label}</div>
-        <div class="appt-status" title="Змінити статус" onclick="cycleApptStatus('${appt.id}','${appt.status||'waiting'}')">${statusEmoji}</div>
-      `;
-      list.appendChild(el);
-    });
-
-    document.getElementById('statTotal').textContent = appts.length;
-    document.getElementById('statDone').textContent  = doneCount;
-    document.getElementById('statLeft').textContent  = leftCount;
-    document.getElementById('statNext').textContent  = nextTime || '—';
-  }
-
-  // ── Set doctor status ─────────────────────────────────────────────
-  window.setMyStatus = async (status) => {
-    myStatus = status;
-
-    // Update button UI
-    document.querySelectorAll('.status-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.status === status);
-    });
-
-    // Write to Firebase
-    await set(doctorStatusRef, {
-      status,
-      timestamp: Date.now(),
-      emoji: doctorStatuses[status]?.emoji || '',
-      label: doctorStatuses[status]?.label || status,
-    });
-  };
-
-  // ── Send chat message ─────────────────────────────────────────────
-  window.sendChat = async () => {
-    const input = document.getElementById('chatInput');
-    const text  = input.value.trim();
-    if (!text) return;
-    input.value = '';
-
-    await push(chatRef, {
-      sender: 'doctor',
-      text,
-      timestamp: Date.now(),
-    });
-  };
-
-  window.sendQuick = (text) => {
-    document.getElementById('chatInput').value = text;
-    sendChat();
-  };
-
-  // ── Cycle appointment status ──────────────────────────────────────
-  window.cycleApptStatus = async (id, current) => {
-    const cycle = ['waiting','arrived','inroom','done','missed'];
-    const next  = cycle[(cycle.indexOf(current)+1) % cycle.length];
-    const apptRef = ref(db, `schedule/today/${id}/status`);
-    await set(apptRef, next);
-  };
-
-  // ── Initialize ────────────────────────────────────────────────────
-  // Set initial doctor status
-  setMyStatus('free');
-
-  // Load demo schedule if empty
-  setTimeout(async () => {
-    const snap = await new Promise(res => onValue(scheduleRef, res, { onlyOnce: true }));
-    if (!snap.val()) {
-      await loadDemoSchedule();
-    }
-  }, 2000);
-
-  async function loadDemoSchedule() {
-    const demos = [
-      { time:'09:00', code:'D-1042 / Олексій', type:'primary', status:'done' },
-      { time:'09:30', code:'D-0881 / Максим', type:'repeat', status:'done' },
-      { time:'10:00', code:'D-1055 / Анонім', type:'inter', status:'done' },
-      { time:'10:30', code:'D-1061 / Дмитро', type:'primary', status:'arrived' },
-      { time:'11:00', code:'Ірина Кова...', type:'derm', status:'waiting' },
-      { time:'11:30', code:'D-0990 / Сергій', type:'repeat', status:'waiting' },
-      { time:'13:00', code:'D-1058 / Микола', type:'removal', status:'waiting' },
-      { time:'14:00', code:'D-1044 / Антон', type:'massage', status:'waiting' },
-      { time:'15:00', code:'D-1063 / Роман', type:'primary', status:'waiting' },
-    ];
-
-    for (const d of demos) {
-      await push(scheduleRef, d);
-    }
-  }
-
-  // ── Helpers ───────────────────────────────────────────────────────
-  function showToast(msg) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 4000);
-  }
-
-  function escHtml(str) {
-    return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  }
-
-  function timeToMins(t) {
-    const [h,m] = t.split(':').map(Number);
-    return h*60+m;
-  }
-
-  // ── Clock ─────────────────────────────────────────────────────────
-  function updateClock() {
-    const now = new Date();
-    document.getElementById('currentDateTime').textContent =
-      now.toLocaleDateString('uk-UA', {weekday:'long',day:'numeric',month:'long'}) +
-      ' · ' + now.toLocaleTimeString('uk-UA',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  }
-  updateClock();
-  setInterval(updateClock, 1000);
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function tm(t){const[h,m]=(t||'0:0').split(':').map(Number);return h*60+m;}
 </script>
-
 </body>
 </html>
